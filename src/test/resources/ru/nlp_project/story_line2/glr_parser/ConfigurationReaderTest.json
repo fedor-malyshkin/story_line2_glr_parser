@@ -1,0 +1,9 @@
+{
+// debug is enabled
+"debug":true,
+"sentence_data":"../token/data/ru-opennlp-model-sent.bin",
+"morph_zip_db":"classpath:ru/nlp_project/story_line2/morph/dict.story_line2.zip",
+"dictionary_file":"dictionary.dict",
+"articles":["art1", "art2"],
+"fact_file":"facts.fact"
+}

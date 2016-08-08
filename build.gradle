@@ -1,0 +1,47 @@
+import org.apache.tools.ant.filters.*
+apply plugin: "jacoco"
+
+task antlrPG(type: JavaExec) {
+	classpath += sourceSets.main.runtimeClasspath
+	main = 'org.antlr.v4.Tool'
+	args 'src/main/resources/ru/nlp_project/story_line2/glr_parser/grammar_parser/nglr_grammar.g4'
+}
+
+antlrPG.setDependsOn([])
+
+task moveGeneratedFiles(type: Copy, dependsOn: antlrPG) {
+	from 'src/main/resources/ru/nlp_project/story_line2/glr_parser/grammar_parser'
+	include '**/*.java'
+	into 'src/main/java/ru/nlp_project/story_line2/glr_parser/grammar_parser'
+	// Use a closure to map the file name
+	rename { String fileName ->
+			 fileName.replace( 'nglr_grammar' , 'NGLR' )
+		   }
+
+    filter{
+        String line -> line.replaceAll("nglr_grammar", "NGLR")
+    }
+}
+
+compileJava.dependsOn moveGeneratedFiles
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/jacocoHtml"
+    }
+}
+
+test {
+    jacoco{
+        excludes = ["ru/nlp_project/story_line2/glr_parser/grammar_parser/*"]
+    }
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+       jvmArgs '-Xmx1024M', '-Xdebug',
+            '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9009'
+    } else {
+	  jvmArgs '-Xmx1024M', '-XX:+UseG1GC'
+	}
+}
+

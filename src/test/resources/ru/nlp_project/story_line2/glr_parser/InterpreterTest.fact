@@ -1,0 +1,9 @@
+[{
+"name":"fact1",
+"fields":[
+{"name":"field1",
+"type":"NUMBER"},
+{"name":"field2",
+"type":"STRING"}
+]
+}]
