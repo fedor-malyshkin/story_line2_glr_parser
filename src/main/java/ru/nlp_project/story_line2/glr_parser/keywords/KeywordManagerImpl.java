@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrTokenizer;
 
@@ -22,7 +24,7 @@ import com.beust.jcommander.JCommander;
 import ru.nlp_project.story_line2.glr_parser.ConfigurationReader;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData.SymbolExtDataTypes;
 import ru.nlp_project.story_line2.glr_parser.Token;
-import ru.nlp_project.story_line2.glr_parser.TokenManager;
+import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl;
 import ru.nlp_project.story_line2.morph.GrammemeUtils;
 import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.Grammemes;
@@ -86,9 +88,7 @@ import ru.nlp_project.story_line2.morph.Grammemes;
  * @author fedor
  *
  */
-public class KeywordManager {
-	public static final String KWS_NAME_FIO = "fio";
-
+public class KeywordManagerImpl implements IKeywordManager {
 	/**
 	 * Вариант покрытия.
 	 * 
@@ -152,6 +152,7 @@ public class KeywordManager {
 
 	}
 
+
 	public static class OptionGrammConverter implements IStringConverter<Set<GrammemeEnum>> {
 
 		@Override
@@ -168,16 +169,19 @@ public class KeywordManager {
 
 	}
 
-	@SuppressWarnings("unused")
-	private ConfigurationReader configurationReader = null;
-	private List<String> keywordSets = new ArrayList<String>();;
+	public static final String KWS_NAME_FIO = "fio";
+
+	@Inject
+	public ConfigurationReader configurationReader = null;
+
+	private List<String> keywordSets = new ArrayList<String>();
 	private Map<String, Map<String, Object>> keywordSetToArgsMap =
-			new HashMap<String, Map<String, Object>>();
+			new HashMap<String, Map<String, Object>>();;
 	private Map<String, PlainKeywordTrie> keywordSetToTrieMap =
 			new HashMap<String, PlainKeywordTrie>();
-
-	private KeywordManager(ConfigurationReader configurationReader) {
-		this.configurationReader = configurationReader;
+	@Inject
+	public KeywordManagerImpl() {
+		super();
 	}
 
 	protected void addKeywordEntry(PlainKeywordTrieBuilder trieBuilder, String kwEntry,
@@ -212,16 +216,13 @@ public class KeywordManager {
 		}
 	}
 
-	/**
-	 * Добавить набор ключевых слов (совместно с опциями) из
-	 * {@link ru.nlp_project.story_line2.glr_parser.DictionaryManager}.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * 
-	 * @param keywordSetName имя набора
-	 * @param keywords сами слова
-	 * @param entry ассоциативный массив записи из словаря
-	 * @param optionsRaw опции для всего набора ключевых слов (глобальные)
+	 * @see ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#addKeywordSet(java.lang.
+	 * String, java.util.List, java.util.Map, java.lang.String)
 	 */
+	@Override
 	public void addKeywordSet(String keywordSetName, List<String> keywords,
 			Map<String, Object> entry, String optionsRaw) {
 		if (keywordSets.contains(keywordSetName))
@@ -235,32 +236,13 @@ public class KeywordManager {
 			addKeywordEntry(trieBuilder, kwEntry, globalOptions, counter++);
 	}
 
-	/**
-	 * Рассчитать оптимальное покрытие токенов (предложение) ключевыми словами (с целью максимизации
-	 * покрытия).
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * <ul>
-	 * <li>На вход подается отсортированный в порядке убывания список вхождений ключевых слов в
-	 * предложение и кол-во токенов в предложении.</li>
-	 * <li>Проход начинается с хвоста предложения к началу, при этом формируются все возможные
-	 * варианты покрытия.</li>
-	 * <li>Вариант покрытия - это возможная комибинация всех имеющихся отрезков, построенная таким
-	 * образом, что они не перекрываются.</li>
-	 * <li>По завершении выполняется поиск максимального и он выбирается в качестве
-	 * оптимального.</li>
-	 * <li>На текущий момент промежуточное удаление заранее не выигрышных вариантов покрытия не
-	 * делается (хотя вся эта информация есть), т.к. их вычисление достаточно трудоемкая процедура и
-	 * вполне возможно просто обменять время вычисления на излишнюю память на период
-	 * вычисления.</li>
-	 * </ul>
-	 * 
-	 * WARNING: очень дорогой алгоритм по по треблению к памяти - для 21 кол-во временных объектов
-	 * может равняться 2 млн.!!!
-	 * 
-	 * @param kwes
-	 * @param tokensLength
-	 * @return
+	 * @see ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#
+	 * calculateOptimalKeywordsCoverage(java.util.List, int)
 	 */
+	@Override
 	public List<? extends IKeywordEntrance> calculateOptimalKeywordsCoverage(
 			List<? extends IKeywordEntrance> kwes, int tokensLength) {
 		if (kwes.size() == 0)
@@ -276,7 +258,7 @@ public class KeywordManager {
 		ArrayList<IKeywordEntrance> list = new ArrayList<>(map.values());
 		sortKeywordEntranceByStartReverse(list);
 		ArrayList<CoverageVariant> coverageVariants =
-				new ArrayList<KeywordManager.CoverageVariant>();
+				new ArrayList<KeywordManagerImpl.CoverageVariant>();
 		// dumb one
 		coverageVariants.add(
 				new CoverageVariant(0, tokensLength, Collections.<IKeywordEntrance>emptyList()));
@@ -329,6 +311,16 @@ public class KeywordManager {
 			}
 		}
 		return result;
+	}
+
+	private void combineExlamationSymbol(List<String> strs) {
+		for (int i = 1; i < strs.size(); i++) {
+			if (strs.get(i - 1).equals("!")) {
+				strs.set(i, "!" + strs.get(i));
+				strs.remove(i - 1);
+				i--;
+			}
+		}
 	}
 
 	protected void combineLookupOptions(LookupOptions localOptions, LookupOptions globalOptions) {
@@ -403,13 +395,14 @@ public class KeywordManager {
 
 	}
 
-	/**
-	 * Определить вхождения ключевых слов.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param usedKeywordSets список наборов ключевых слов
-	 * @param tokens токены для анализа
-	 * @return список вхождений
+	 * @see
+	 * ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#detectPlainKeywordEntrances(
+	 * java.util.Collection, java.util.List)
 	 */
+	@Override
 	public List<PlainKeywordEntrance> detectPlainKeywordEntrances(
 			Collection<String> usedKeywordSets, List<Token> tokens) {
 		List<PlainKeywordEntrance> result = new ArrayList<PlainKeywordEntrance>();
@@ -419,13 +412,14 @@ public class KeywordManager {
 		return result;
 	}
 
-	/**
-	 * Определить вхождения ключевых слов.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param keywordSetName наборов ключевых слов
-	 * @param tokens токены для анализа
-	 * @return список вхождений
+	 * @see
+	 * ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#detectPlainKeywordEntrances(
+	 * java.lang.String, java.util.List)
 	 */
+	@Override
 	public List<PlainKeywordEntrance> detectPlainKeywordEntrances(String keywordSetName,
 			List<Token> tokens) {
 		if (keywordSetName.equalsIgnoreCase(KWS_NAME_FIO))
@@ -440,11 +434,26 @@ public class KeywordManager {
 		return detector.detectPlainKeywordEntrances();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#getArgsByKeywordSetName(java.
+	 * lang.String)
+	 */
+	@Override
 	public Map<String, Object> getArgsByKeywordSetName(String keywordSetName) {
 		return keywordSetToArgsMap.get(keywordSetName);
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#getKeywordSetsNameByIndex(int)
+	 */
+	@Override
 	public String getKeywordSetsNameByIndex(int index) {
 		return keywordSets.get(index);
 	}
@@ -466,23 +475,13 @@ public class KeywordManager {
 		int sepPos = StringUtils.indexOf(kwEntry, "|");
 		if (sepPos != -1)
 			toSpit = kwEntry.substring(0, sepPos);
-		List<String> strs = TokenManager.splitIntoStrings(toSpit.toLowerCase());
+		List<String> strs = TokenManagerImpl.splitIntoStrings(toSpit.toLowerCase());
 		combineExlamationSymbol(strs);
 		for (int i = 0; i < strs.size(); i++)
 			strings.add(strs.get(i));
 		if (sepPos != -1)
 			return parseLookupOptions(kwEntry.substring(sepPos + 1, kwEntry.length()));
 		return new LookupOptions();
-	}
-
-	private void combineExlamationSymbol(List<String> strs) {
-		for (int i = 1; i < strs.size(); i++) {
-			if (strs.get(i - 1).equals("!")) {
-				strs.set(i, "!" + strs.get(i));
-				strs.remove(i - 1);
-				i--;
-			}
-		}
 	}
 
 	/**
@@ -518,41 +517,14 @@ public class KeywordManager {
 		return result;
 	}
 
-	public void setConfigurationReader(ConfigurationReader configurationReader) {
-		this.configurationReader = configurationReader;
-	}
-
-	private void sortKeywordEntranceByStartReverse(List<? extends IKeywordEntrance> kwes) {
-		Collections.sort(kwes, new Comparator<IKeywordEntrance>() {
-			@Override
-			public int compare(IKeywordEntrance o1, IKeywordEntrance o2) {
-				return -1 * Integer.compare(o1.getFrom(), o2.getFrom());
-			}
-		});
-	}
-
-	private void sortKeywordEntranceByStart(List<? extends IKeywordEntrance> kwes) {
-		Collections.sort(kwes, new Comparator<IKeywordEntrance>() {
-			@Override
-			public int compare(IKeywordEntrance o1, IKeywordEntrance o2) {
-				return Integer.compare(o1.getFrom(), o2.getFrom());
-			}
-		});
-	}
-
-	public static KeywordManager newInstance(ConfigurationReader configurationReader) {
-		KeywordManager result = new KeywordManager(configurationReader);
-		return result;
-	}
-
-	/**
-	 * Простая фильтрация вхождений.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * 1) Сортировка по уменьшению площади покрытия (DESC). 2) Удаление сегментов, которые полностью
-	 * входят в большие. 3) ПОвторять до тех пор пока не получится ничего удалять.
-	 * 
-	 * @param entrances
+	 * @see
+	 * ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#simpleCoverageFiltering(java.
+	 * util.List)
 	 */
+	@Override
 	public void simpleCoverageFiltering(List<? extends IKeywordEntrance> entrances) {
 		Collections.sort(entrances, new Comparator<IKeywordEntrance>() {
 			@Override
@@ -571,5 +543,24 @@ public class KeywordManager {
 					listIter.remove();
 			}
 		}
+	}
+
+	private void sortKeywordEntranceByStart(List<? extends IKeywordEntrance> kwes) {
+		Collections.sort(kwes, new Comparator<IKeywordEntrance>() {
+			@Override
+			public int compare(IKeywordEntrance o1, IKeywordEntrance o2) {
+				return Integer.compare(o1.getFrom(), o2.getFrom());
+			}
+		});
+	}
+
+
+	private void sortKeywordEntranceByStartReverse(List<? extends IKeywordEntrance> kwes) {
+		Collections.sort(kwes, new Comparator<IKeywordEntrance>() {
+			@Override
+			public int compare(IKeywordEntrance o1, IKeywordEntrance o2) {
+				return -1 * Integer.compare(o1.getFrom(), o2.getFrom());
+			}
+		});
 	}
 }

@@ -13,8 +13,8 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import ru.nlp_project.story_line2.glr_parser.GrammarManager.GrammarDirectiveTypes;
-import ru.nlp_project.story_line2.glr_parser.Interpreter;
+import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl.GrammarDirectiveTypes;
+import ru.nlp_project.story_line2.glr_parser.InterpreterImpl;
 import ru.nlp_project.story_line2.glr_parser.SymbolExt;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData;
 import ru.nlp_project.story_line2.glr_parser.SymbolInterpData;
@@ -448,10 +448,10 @@ public class NGLRGrammarBuilder implements NGLRListener {
 
     String paramValue = ctx.paramName != null ? ctx.paramName.getText() : "";
     // check
-    if (!paramValue.isEmpty() && !Interpreter.PARAM_NO_NORM.equals(paramValue))
+    if (!paramValue.isEmpty() && !InterpreterImpl.PARAM_NO_NORM.equals(paramValue))
       throw new IllegalArgumentException(
           String.format("Unknown interpreter parameter '%s'. Valid only '%s'.",
-              paramValue, Interpreter.PARAM_NO_NORM));
+              paramValue, InterpreterImpl.PARAM_NO_NORM));
 
     if (ctx.factVal != null && ctx.factVal.size() > 0) {
       String fromFactFull = convertTokenListToString(ctx.nameVal);

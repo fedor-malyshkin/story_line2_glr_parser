@@ -9,3 +9,5 @@
 target
 bin
 build
+/.apt_generated/
+*.factorypath

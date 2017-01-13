@@ -12,8 +12,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.nlp_project.story_line2.glr_parser.Interpreter.Fact;
-import ru.nlp_project.story_line2.glr_parser.Interpreter.TreeInterpData;
+import ru.nlp_project.story_line2.glr_parser.InterpreterImpl.Fact;
+import ru.nlp_project.story_line2.glr_parser.InterpreterImpl.TreeInterpData;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol.SymbolTypes;
 
@@ -34,12 +34,12 @@ public class InterpreterTest {
   @SuppressWarnings("deprecation")
   @Before
   public void setUp() {
-    testable = new Interpreter();
+    testable = new InterpreterImpl();
     testable.setParseTreeSerializer(new ParseTreeSerializerStub());
 
   }
 
-  private Interpreter testable;
+  private InterpreterImpl testable;
 
   @Test
   public void testReadFactFile() throws IOException {
@@ -139,7 +139,7 @@ public class InterpreterTest {
     testable.readFactFile(stream1);
     // testable.setTokens(TestFixtureBuilder.createTokens("ABCDEFGHIJKLMNO"));
     List<TreeInterpData> treeInterpDatas =
-        new ArrayList<Interpreter.TreeInterpData>();
+        new ArrayList<InterpreterImpl.TreeInterpData>();
     treeInterpDatas.add(testable.newTreeInterpData(0, 3, "fact1", "field2",
         new SymbolInterpData("fact1", "field2", null),
         createParseTreeNode("ter")));
@@ -159,9 +159,9 @@ public class InterpreterTest {
     testable.readFactFile(stream1);
     // testable.setTokens(TestFixtureBuilder.createTokens("ABCDEFGHIJKLMNO"));
     List<TreeInterpData> treeInterpDatas =
-        new ArrayList<Interpreter.TreeInterpData>();
+        new ArrayList<InterpreterImpl.TreeInterpData>();
     treeInterpDatas.add(testable.newTreeInterpData(0, 3, "fact1", "field2",
-        new SymbolInterpData("fact1", "field2", Interpreter.PARAM_NO_NORM),
+        new SymbolInterpData("fact1", "field2", InterpreterImpl.PARAM_NO_NORM),
         createParseTreeNode("ter")));
     List<Fact> facts = testable.processTreeInterpDatas(treeInterpDatas);
     assertEquals(
@@ -178,7 +178,7 @@ public class InterpreterTest {
     testable.readFactFile(stream1);
     // testable.setTokens(TestFixtureBuilder.createTokens("ABCDEFGHIJKLMNO"));
     List<TreeInterpData> treeInterpDatas =
-        new ArrayList<Interpreter.TreeInterpData>();
+        new ArrayList<InterpreterImpl.TreeInterpData>();
     treeInterpDatas.add(testable.newTreeInterpData(0, 3, "fact1", "field2",
         new SymbolInterpData("fact1", "field2", null),
         createParseTreeNode("val1")));
@@ -205,7 +205,7 @@ public class InterpreterTest {
     testable.readFactFile(stream1);
     // testable.setTokens(TestFixtureBuilder.createTokens("ABCDEFGHIJKLMNO"));
     List<TreeInterpData> treeInterpDatas =
-        new ArrayList<Interpreter.TreeInterpData>();
+        new ArrayList<InterpreterImpl.TreeInterpData>();
     treeInterpDatas.add(testable.newTreeInterpData(0, 3, "fact1", "field2",
         new SymbolInterpData("fact1", "field2", null),
         createParseTreeNode("val1")));

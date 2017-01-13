@@ -6,7 +6,7 @@ import java.util.Map;
 
 import ru.nlp_project.story_line2.glr_parser.eval.Grammar;
 import ru.nlp_project.story_line2.glr_parser.GLRParser.Sentence;
-import ru.nlp_project.story_line2.glr_parser.GrammarManager.GrammarDirectiveTypes;
+import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl.GrammarDirectiveTypes;
 import ru.nlp_project.story_line2.glr_parser.ParseTreeValidator.ParseTreeValidationException;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordEntrance;
 

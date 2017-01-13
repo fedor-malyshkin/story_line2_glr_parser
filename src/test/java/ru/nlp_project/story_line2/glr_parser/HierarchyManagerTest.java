@@ -13,11 +13,11 @@ import org.junit.Test;
 
 public class HierarchyManagerTest {
 
-  private HierarchyManager testable;
+  private HierarchyManagerImpl testable;
 
   @Before
   public void setUp() {
-    testable = new HierarchyManager();
+    testable = new HierarchyManagerImpl();
   }
 
   @Test

@@ -12,8 +12,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.nlp_project.story_line2.glr_parser.GrammarManager;
-import ru.nlp_project.story_line2.glr_parser.GrammarManager.GrammarDirectiveTypes;
+import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl;
+import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl.GrammarDirectiveTypes;
 import ru.nlp_project.story_line2.glr_parser.eval.Grammar;
 
 public class NGLRGrammarBuilderTest {
@@ -171,7 +171,7 @@ public class NGLRGrammarBuilderTest {
         "T->SomeGrammeme<rt, gram=\"sing\", gram=\"sing,noun\", gnc-agr=[1asd]>?;",
         result.toString());
     Map<GrammarDirectiveTypes, Object> grammarDirectives =
-        new TreeMap<GrammarManager.GrammarDirectiveTypes, Object>(
+        new TreeMap<GrammarManagerImpl.GrammarDirectiveTypes, Object>(
             testable.getGrammarDirectives());
     assertEquals("{FILTER=true, INCLUDE=[some_file.grm], KWSET=[run01, run02]}",
         grammarDirectives.toString());

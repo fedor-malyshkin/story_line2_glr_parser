@@ -17,8 +17,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import ru.nlp_project.story_line2.glr_parser.Interpreter.Fact;
-import ru.nlp_project.story_line2.glr_parser.Interpreter.FactField;
+import ru.nlp_project.story_line2.glr_parser.InterpreterImpl.Fact;
+import ru.nlp_project.story_line2.glr_parser.InterpreterImpl.FactField;
 import ru.nlp_project.story_line2.glr_parser.ParseTreeValidator.ParseTreeValidationException;
 
 public class GLRParserTestIntegr {

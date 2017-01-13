@@ -1,7 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -11,8 +9,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import static org.junit.Assert.assertEquals;
+
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordEntrance;
-import ru.nlp_project.story_line2.glr_parser.keywords.KeywordManager;
+import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 import ru.nlp_project.story_line2.glr_parser.keywords.PlainKeywordEntrance;
 
 public class ParseTreeSerializerTest {
@@ -24,21 +24,20 @@ public class ParseTreeSerializerTest {
 	private static String parserConfigDir;
 	private static GLRParser glrParser;
 
-	private static TokenManager tokenManager;
+	private static ITokenManager tokenManager;
 
-	private static GrammarManager grammarManager;
+	private static GrammarManagerImpl grammarManager;
 
-	private static KeywordManager keywordManager;
+	private static IKeywordManager keywordManager;
 
-	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		parserConfigDir = TestFixtureBuilder.unzipToTempDir(
 				"ru/nlp_project/story_line2/glr_parser/ParseTreeSerializerTest.zip");
 		glrParser = GLRParser.newInstance(parserConfigDir + "/glr-config.json", true);
-		tokenManager = glrParser.getTokenManager();
-		grammarManager = glrParser.getGrammarManager();
-		keywordManager = glrParser.getKeywordManager();
+		tokenManager = glrParser.tokenManager;
+		grammarManager = (GrammarManagerImpl) glrParser.grammarManager;
+		keywordManager = glrParser.keywordManager;
 
 	}
 
@@ -151,7 +150,8 @@ public class ParseTreeSerializerTest {
 
 	@Test
 	public void checkLemmParameter() throws Exception {
-		List<Token> tokens = tokenManager.splitIntoTokens("сильные люди поехали из российской федерации", true);
+		List<Token> tokens =
+				tokenManager.splitIntoTokens("сильные люди поехали из российской федерации", true);
 		String grammarText = "Root->S; S->Adj Noun<rt> verb prep Noun;";
 
 		List<PlainKeywordEntrance> keywordEntrances =

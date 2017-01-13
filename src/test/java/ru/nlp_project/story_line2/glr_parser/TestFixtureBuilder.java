@@ -22,8 +22,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Ignore;
 
-import ru.nlp_project.story_line2.glr_parser.GrammarManager.GrammarDirectiveTypes;
-import ru.nlp_project.story_line2.glr_parser.Interpreter.Fact;
+import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl.GrammarDirectiveTypes;
+import ru.nlp_project.story_line2.glr_parser.InterpreterImpl.Fact;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
 import ru.nlp_project.story_line2.glr_parser.eval.Grammar;
 import ru.nlp_project.story_line2.glr_parser.eval.Projection;
@@ -179,7 +179,7 @@ public class TestFixtureBuilder {
   }
 
   public static ParseTreeNode createParseTree(String grammarText,
-      List<Token> tokens, GrammarManager grammarManager) {
+      List<Token> tokens, GrammarManagerImpl grammarManager) {
     Grammar grammar = TestFixtureBuilder.parseGrammar(grammarText, "Root");
     RNGLRAnalyser analyser = grammarManager.createAnalyser(grammar);
     assertTrue(analyser.processTokens(tokens));
@@ -201,10 +201,10 @@ public class TestFixtureBuilder {
   }
 
   public static ParseTreeNode createAndValidateParseTree(String grammarText,
-      List<Token> tokens, GrammarManager grammarManager) throws Exception {
+      List<Token> tokens, GrammarManagerImpl grammarManager) throws Exception {
     ParseTreeNode root = createParseTree(grammarText, tokens, grammarManager);
     ParseTreeValidator validator =
-        new ParseTreeValidator(HierarchyManager.newInstance(null));
+        new ParseTreeValidator(new HierarchyManagerImpl());
     validator.validateTree(createDummySentenceProcessingContext(), root);
     return root;
   }

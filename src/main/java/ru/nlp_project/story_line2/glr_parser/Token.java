@@ -176,7 +176,7 @@ public class Token {
   boolean hReg2 = false;
   /**
    * Само значение {@link IKeywordEntrance} (в случае {@link GrammarKeywordEntrance} через него можно получить 
-   * доступ к {@link ru.nlp_project.story_line2.glr_parser.Interpreter.InterpretationResult} для интерпретации).
+   * доступ к {@link ru.nlp_project.story_line2.glr_parser.InterpreterImpl.InterpretationResult} для интерпретации).
    */
   IKeywordEntrance kw = null;
   /**

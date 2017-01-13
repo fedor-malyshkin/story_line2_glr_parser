@@ -11,14 +11,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import ru.nlp_project.story_line2.glr_parser.NameFinder.FIOEntry;
+import ru.nlp_project.story_line2.glr_parser.NameFinderImpl.FIOEntry;
 import ru.nlp_project.story_line2.glr_parser.Token.Lexeme;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordEntrance;
-import ru.nlp_project.story_line2.glr_parser.keywords.KeywordManager;
+import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 import ru.nlp_project.story_line2.glr_parser.keywords.PlainKeywordEntrance;
 import ru.nlp_project.story_line2.morph.MorphAnalyser;
 import ru.nlp_project.story_line2.morph.SurnameAnalysisResult;
@@ -36,7 +38,12 @@ import ru.nlp_project.story_line2.morph.WordformAnalysisResult;
  * @author fedor
  *
  */
-public class TokenManager {
+public class TokenManagerImpl implements ITokenManager {
+
+	@Inject
+	public TokenManagerImpl() {
+		super();
+	}
 
 	class FIOKeywordToken extends Token {
 
@@ -148,14 +155,6 @@ public class TokenManager {
 		return morphAnalyser;
 	}
 
-	public static TokenManager newInstance(ConfigurationReader configurationReader,
-			KeywordManager keywordManager, boolean initMorph) throws IOException {
-		TokenManager result = new TokenManager();
-		result.configurationReader = configurationReader;
-		result.keywordManager = keywordManager;
-		result.initialize(initMorph);
-		return result;
-	}
 
 	/**
 	 * 
@@ -190,20 +189,26 @@ public class TokenManager {
 		return result;
 	}
 
-	private KeywordManager keywordManager = null;
-	private boolean initMorph;
 
-	private ConfigurationReader configurationReader;
+	@Inject
+	public IKeywordManager keywordManager = null;
 
-	private TokenManager() {}
+	public boolean initMorph;
+	@Inject
+	public ConfigurationReader configurationReader;
+
+	public TokenManagerImpl(boolean initMorph) {
+		this.initMorph = initMorph;
+	}
+
 
 	protected void analyseTokenKeywords(Token token) {
 		token.kwColon = token.value.equals(":");
 		token.kwComma = token.value.equals(",");
 		token.kwDollar = StringUtils.contains(token.value, '$');
 		token.kwHyphen = StringUtils.containsOnly(token.value, '-');
-		token.kwLBracket = StringUtils.containsOnly(token.value, TokenManager.LBRACKETS);
-		token.kwRBracket = StringUtils.containsOnly(token.value, TokenManager.RBRACKETS);
+		token.kwLBracket = StringUtils.containsOnly(token.value, TokenManagerImpl.LBRACKETS);
+		token.kwRBracket = StringUtils.containsOnly(token.value, TokenManagerImpl.RBRACKETS);
 		token.kwPercent = StringUtils.contains(token.value, '%');
 		token.kwPlusSign = token.value.equals("+");
 		token.kwPunct = token.value.equals(".");
@@ -290,6 +295,13 @@ public class TokenManager {
 			analyseTokenRegistry(list.get(counter));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.nlp_project.story_line2.glr_parser.ITokenManager#assignAllLexemes(java.lang.String,
+	 * ru.nlp_project.story_line2.glr_parser.Token)
+	 */
+	@Override
 	public void assignAllLexemes(String opencorporaId, Token token) {
 		Collection<WordformAnalysisResult> was =
 				morphAnalyser.getWordformAnalysisResultsById(opencorporaId);
@@ -297,6 +309,11 @@ public class TokenManager {
 		for (WordformAnalysisResult wa : was)
 			token.addLexeme(wa.opencorporaId, wa.lemm, wa.value, wa.grammemes, wa.exactMatch);
 
+	}
+
+	@Deprecated
+	public Token createDummyFIOKeywordToken(String value) {
+		return new FIOKeywordToken(0, 0, value, Collections.emptyList(), null, null);
 	}
 
 	@Deprecated
@@ -415,7 +432,7 @@ public class TokenManager {
 	private Token createPlainKeywordToken(List<Token> tokens, PlainKeywordEntrance pkw, int diff) {
 		List<Token> subList =
 				tokens.subList(pkw.getFrom() + diff, pkw.getFrom() + pkw.getLength() + diff);
-		
+
 		// повторяем полное построение токена в случае наличия леммы для замены в ключевом слове
 		// при этом все дочерние токены (даже если их было несколько) -- игнорируются
 		// (и в методе "modifyTokensByKeywords" буду выброшены окончательно)
@@ -501,7 +518,7 @@ public class TokenManager {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void initialize(boolean initMorph) throws IOException {
+	public void initialize() {
 		Arrays.sort(DELIMERS);
 		Arrays.sort(QUOTES);
 		Arrays.sort(LBRACKETS);
@@ -515,18 +532,17 @@ public class TokenManager {
 				SIMPLE_TOKEN_SERIALIZATION_SEP);
 		Arrays.sort(WORD_DISALLOWED_SYMBOLS);
 
-		this.initMorph = initMorph;
-		if (initMorph && (GLRParser.invalidatedMorphDB || morphAnalyser == null)) {
-			String morphZipDB = configurationReader.getConfigurationMain().morphZipDB;
-			morphAnalyser =
-					MorphAnalyser.newInstance(configurationReader.getInputStream(morphZipDB), true);
-			GLRParser.invalidatedMorphDB = false;
+		try {
+			if (initMorph && (GLRParser.invalidatedMorphDB || morphAnalyser == null)) {
+				String morphZipDB = configurationReader.getConfigurationMain().morphZipDB;
+				morphAnalyser = MorphAnalyser
+						.newInstance(configurationReader.getInputStream(morphZipDB), true);
+				GLRParser.invalidatedMorphDB = false;
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
 
-	}
-
-	public void shutdown() {
-		morphAnalyser.shutdown();
 	}
 
 	/**
@@ -550,24 +566,14 @@ public class TokenManager {
 		}
 	}
 
-	/**
-	 * Выполнить анализ поданной коллекции токенов и изменить её с учетом имеющихся вхождений
-	 * различных типов вхождений {@link IKeywordEntrance} и заменой их на соответствующи экземпляры
-	 * {@link PlainKeywordToken} и {@link GrammarKeywordToken}.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * При создании {@link PlainKeywordToken} и {@link GrammarKeywordToken} - необходимые данные о
-	 * лексеммах копируются с главных слов.
-	 * 
-	 * !!! - Делается важное допущение о том. что entrance отсортированы по возрастанию.
-	 * 
-	 * Пример: "Ел морковку у африканского слона 29 декабря 2011 года." После применения kwtype’ов
-	 * наша грамматика получит следующий текст: "Ел морковку у африканского_слона
-	 * 29_декабря_2011_года."
-	 * 
-	 * 
-	 * @param tokens
-	 * @param keywordEntrances
+	 * @see
+	 * ru.nlp_project.story_line2.glr_parser.ITokenManager#modifyTokensByKeywords(java.util.List,
+	 * java.util.List)
 	 */
+	@Override
 	public void modifyTokensByKeywords(List<Token> tokens,
 			List<? extends IKeywordEntrance> keywordEntrances) {
 		int diff = 0; // разница по сравнению с размером оригинального потока
@@ -598,25 +604,28 @@ public class TokenManager {
 		}
 	}
 
-	@Deprecated
-	public void setConfigurationReader(ConfigurationReader configurationReader) {
-		this.configurationReader = configurationReader;
-	}
-
-	@Deprecated
-	public void setKeywordManager(KeywordManager keywordManager) {
-		this.keywordManager = keywordManager;
-	}
-
-	/**
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * Осуществить разделение входящего текста на токены. В последующим выполнить анализ теста и
-	 * окружения для дополнения расширенной информацией.
-	 * 
-	 * @param text текст для разбиения
-	 * @param addMorphInfo выполнить пополнение морфологической информаией.
-	 * @return
+	 * @see ru.nlp_project.story_line2.glr_parser.ITokenManager#predictAsSurnameAndFillLexemes(ru.
+	 * nlp_project.story_line2.glr_parser.Token)
 	 */
+	@Override
+	public List<SurnameAnalysisResult> predictAsSurnameAndFillLexemes(Token token) {
+		return morphAnalyser.predictAsSurname(token.value.toLowerCase());
+	}
+
+	public void shutdown() {
+		morphAnalyser.shutdown();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ru.nlp_project.story_line2.glr_parser.ITokenManager#splitIntoTokens(java.lang.String,
+	 * boolean)
+	 */
+	@Override
 	public List<Token> splitIntoTokens(String text, boolean addMorphInfo) {
 		ArrayList<Token> result = new ArrayList<Token>(10);
 		int last = 0;
@@ -683,14 +692,5 @@ public class TokenManager {
 		} else
 			throw new IllegalStateException("Unknown token class: " + token.getClass());
 
-	}
-
-	public List<SurnameAnalysisResult> predictAsSurnameAndFillLexemes(Token token) {
-		return morphAnalyser.predictAsSurname(token.value.toLowerCase());
-	}
-
-	@Deprecated
-	public Token createDummyFIOKeywordToken(String value) {
-		return new FIOKeywordToken(0, 0, value, Collections.emptyList(), null, null);
 	}
 }

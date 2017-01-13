@@ -3,7 +3,7 @@ package ru.nlp_project.story_line2.glr_parser;
 import java.util.LinkedList;
 import java.util.List;
 
-import ru.nlp_project.story_line2.glr_parser.NameFinder.FIOEntry;
+import ru.nlp_project.story_line2.glr_parser.NameFinderImpl.FIOEntry;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordEntrance;
 
 public class FIOKeywordEntrance implements IKeywordEntrance {

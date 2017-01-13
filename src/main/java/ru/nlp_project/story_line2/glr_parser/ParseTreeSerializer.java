@@ -13,15 +13,15 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import ru.nlp_project.story_line2.glr_parser.NameFinder.FIOEntry;
+import ru.nlp_project.story_line2.glr_parser.NameFinderImpl.FIOEntry;
 import ru.nlp_project.story_line2.glr_parser.ParseTreeNode.IInOrderWalkProcessor;
 import ru.nlp_project.story_line2.glr_parser.ParseTreeNode.ILevelOrderWalkProcessor;
 import ru.nlp_project.story_line2.glr_parser.ParseTreeValidator.NonTerminalToken;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData.SymbolExtDataTypes;
 import ru.nlp_project.story_line2.glr_parser.Token.Lexeme;
-import ru.nlp_project.story_line2.glr_parser.TokenManager.FIOKeywordToken;
-import ru.nlp_project.story_line2.glr_parser.TokenManager.GrammarKeywordToken;
-import ru.nlp_project.story_line2.glr_parser.TokenManager.PlainKeywordToken;
+import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl.FIOKeywordToken;
+import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl.GrammarKeywordToken;
+import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl.PlainKeywordToken;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol;
 import ru.nlp_project.story_line2.morph.GrammemeUtils;
 import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
@@ -52,13 +52,13 @@ import ru.nlp_project.story_line2.morph.Grammemes;
  *
  */
 public class ParseTreeSerializer {
-  public static ParseTreeSerializer newInstance(TokenManager tokenManager) {
+  public static ParseTreeSerializer newInstance(ITokenManager tokenManager) {
     ParseTreeSerializer result = new ParseTreeSerializer();
     result.tokenManager = tokenManager;
     return result;
   }
 
-  private TokenManager tokenManager;
+  private ITokenManager tokenManager;
 
   protected ParseTreeSerializer() {
   }

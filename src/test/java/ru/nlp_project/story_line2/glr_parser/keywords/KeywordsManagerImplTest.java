@@ -17,29 +17,28 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.nlp_project.story_line2.glr_parser.GLRParser;
-import ru.nlp_project.story_line2.glr_parser.SentenceProcessorPool;
+import ru.nlp_project.story_line2.glr_parser.ISentenceProcessorPool;
 import ru.nlp_project.story_line2.glr_parser.TestFixtureBuilder;
 import ru.nlp_project.story_line2.glr_parser.Token;
-import ru.nlp_project.story_line2.glr_parser.TokenManager;
+import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl;
 
-public class KeywordsManagerTest {
+public class KeywordsManagerImplTest {
 
 	private static GLRParser glrParser;
-	private static SentenceProcessorPool sentenceProcessorPool;
-	private KeywordManager testable;
+	private static ISentenceProcessorPool sentenceProcessorPool;
+	private KeywordManagerImpl testable;
 
-	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		String parserConfigDir = TestFixtureBuilder
 				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/KeywordsManagerTest.zip");
 		glrParser = GLRParser.newInstance(parserConfigDir + "/glr-config.json", true);
-		sentenceProcessorPool = glrParser.getSentenceProcessorPool();
+		sentenceProcessorPool = glrParser.sentenceProcessorPool;
 	}
 
 	@Before
 	public void setUp() {
-		testable = KeywordManager.newInstance(null);
+		testable = new KeywordManagerImpl();
 	}
 
 	@Test
@@ -147,7 +146,8 @@ public class KeywordsManagerTest {
 	public void testDetectKeywordEntrances_TwiceTheSame() throws IOException {
 		List<Token> tokens = sentenceProcessorPool.generateTokens("Собака на сене лежала.", false);
 		// replace first
-		TokenManager tokenManager = TokenManager.newInstance(null, null, false);
+		TokenManagerImpl tokenManager = new TokenManagerImpl( false);
+		tokenManager.initialize();
 		Token token = tokenManager.createDummyPlainKeywordToken("Собака");
 		tokens.set(0, token);
 		List<String> kws = Arrays.asList("собака", "на сене", "собака на сене");

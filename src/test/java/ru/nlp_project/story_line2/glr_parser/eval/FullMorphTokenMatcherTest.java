@@ -15,7 +15,7 @@ import org.apache.commons.collections4.map.LazyMap;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.nlp_project.story_line2.glr_parser.HierarchyManager;
+import ru.nlp_project.story_line2.glr_parser.HierarchyManagerImpl;
 import ru.nlp_project.story_line2.glr_parser.SymbolExt;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData;
 import ru.nlp_project.story_line2.glr_parser.Token;
@@ -43,7 +43,7 @@ public class FullMorphTokenMatcherTest {
     actionTableEntry = new HashMap<Symbol, List<ActionRecord>>();
     baseNTToNTExtDataMap =
         LazyMap.lazyMap(new HashMap<Symbol, List<Symbol>>(), factoryListSymb);
-    testable = new FullMorphTokenMatcher(HierarchyManager.newInstance(null));
+    testable = new FullMorphTokenMatcher(new HierarchyManagerImpl());
   }
 
   /**

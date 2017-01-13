@@ -13,10 +13,9 @@ public class ParseTreeValidatorTest {
 
   private static String parserConfigDir;
   private static GLRParser glrParser;
-  private static TokenManager tokenManager;
-  private static GrammarManager grammarManager;
+  private static ITokenManager tokenManager;
+  private static GrammarManagerImpl grammarManager;
 
-  @SuppressWarnings("deprecation")
   @BeforeClass
   public static void setUpClass() throws IOException {
     parserConfigDir = TestFixtureBuilder.unzipToTempDir(
@@ -25,15 +24,15 @@ public class ParseTreeValidatorTest {
 
     glrParser =
         GLRParser.newInstance(parserConfigDir + "/glr-config.json", true);
-    tokenManager = glrParser.getTokenManager();
-    grammarManager = glrParser.getGrammarManager();
+    tokenManager = glrParser.tokenManager;
+    grammarManager = (GrammarManagerImpl) glrParser.grammarManager;
   }
 
   private ParseTreeValidator testable;
 
   @Before
   public void setUp() throws IOException {
-    testable = new ParseTreeValidator(HierarchyManager.newInstance(null));
+    testable = new ParseTreeValidator(new HierarchyManagerImpl());
   }
 
   /**

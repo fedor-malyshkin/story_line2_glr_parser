@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.lang3.EnumUtils;
 
-import ru.nlp_project.story_line2.glr_parser.GrammarManager.GrammarDirectiveTypes;
+import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl.GrammarDirectiveTypes;
 import ru.nlp_project.story_line2.glr_parser.SymbolRE.RETypes;
 import ru.nlp_project.story_line2.glr_parser.SymbolTable.SymbolTableEntryTypes;
 import ru.nlp_project.story_line2.glr_parser.eval.Grammar;

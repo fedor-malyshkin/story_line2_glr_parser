@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.EnumUtils;
 
-import ru.nlp_project.story_line2.glr_parser.HierarchyManager;
+import ru.nlp_project.story_line2.glr_parser.IHierarchyManager;
 import ru.nlp_project.story_line2.glr_parser.SymbolExt;
 import ru.nlp_project.story_line2.glr_parser.SymbolRestrictionChecker;
 import ru.nlp_project.story_line2.glr_parser.SymbolTable;
@@ -41,7 +41,7 @@ public class FullMorphTokenMatcher implements IGLRTokenMatcher {
   private Token currentToken;
   private SymbolRestrictionChecker checker = null;
 
-  public FullMorphTokenMatcher(HierarchyManager hierarchyManager) {
+  public FullMorphTokenMatcher(IHierarchyManager hierarchyManager) {
     checker = new SymbolRestrictionChecker(hierarchyManager);
   }
 

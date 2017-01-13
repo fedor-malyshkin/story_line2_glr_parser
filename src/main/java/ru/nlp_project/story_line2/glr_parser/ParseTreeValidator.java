@@ -16,7 +16,7 @@ import ru.nlp_project.story_line2.glr_parser.ParseTreeNode.IPostOrderWalkLeafFir
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData.SymbolExtDataTypes;
 import ru.nlp_project.story_line2.glr_parser.Token.Lexeme;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
-import ru.nlp_project.story_line2.glr_parser.TokenManager.GrammarKeywordToken;
+import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl.GrammarKeywordToken;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol;
 import ru.nlp_project.story_line2.morph.Grammemes;
 
@@ -116,9 +116,9 @@ public class ParseTreeValidator {
   private SymbolRestrictionChecker checker;
   private Map<String, SymbolAgreement> agrMap;
   private List<SymbolAgreement> agrList;
-  private HierarchyManager hierarchyManager;
+  private IHierarchyManager hierarchyManager;
 
-  public ParseTreeValidator(HierarchyManager hierarchyManager) {
+  public ParseTreeValidator(IHierarchyManager hierarchyManager) {
     this.hierarchyManager = hierarchyManager;
   }
 
