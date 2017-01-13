@@ -22,7 +22,7 @@ import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl.PlainKeywordToken;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 import ru.nlp_project.story_line2.glr_parser.keywords.PlainKeywordEntrance;
 
-public class TokenManagerTest {
+public class TokenManagerImplTest {
 	private TokenManagerImpl testable;
 	private IKeywordManager keywordManagerMock;
 	private static GLRParser glrParser;

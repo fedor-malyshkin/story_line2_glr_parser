@@ -11,7 +11,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HierarchyManagerTest {
+public class HierarchyManagerImplTest {
 
   private HierarchyManagerImpl testable;
 

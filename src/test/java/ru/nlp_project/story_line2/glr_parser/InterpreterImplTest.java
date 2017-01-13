@@ -17,7 +17,7 @@ import ru.nlp_project.story_line2.glr_parser.InterpreterImpl.TreeInterpData;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol.SymbolTypes;
 
-public class InterpreterTest {
+public class InterpreterImplTest {
 
   class ParseTreeSerializerStub extends ParseTreeSerializer {
 
