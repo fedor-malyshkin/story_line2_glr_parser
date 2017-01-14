@@ -1,10 +1,6 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +14,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl.GrammarDirectiveTypes;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
 import ru.nlp_project.story_line2.glr_parser.eval.Grammar;
@@ -28,21 +29,18 @@ import ru.nlp_project.story_line2.glr_parser.eval.Symbol.SymbolTypes;
 
 public class GrammarManagerImplTest {
 
-	private static ConfigurationReader configurationReader;
 	private static String parserConfigDir;
 	private static GLRParser glrParser;
 	private static ITokenManager tokenManager;
-	private static IHierarchyManager hierarchyManager;
 
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		parserConfigDir = TestFixtureBuilder
-				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/GrammarManagerTest.zip");
-		configurationReader = ConfigurationReader.newInstance(parserConfigDir + "/glr-config.json");
-
-		glrParser = GLRParser.newInstance(parserConfigDir + "/glr-config.json", true);
+				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/GrammarManagerImplTest.zip");
+		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
+				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
+		glrParser = GLRParser.newInstance(true);
 		tokenManager = glrParser.tokenManager;
-		hierarchyManager = glrParser.hierarchyManager;
 	}
 
 	private GrammarManagerImpl testable;
@@ -50,8 +48,7 @@ public class GrammarManagerImplTest {
 	@Before
 	public void setUp() {
 		testable = new GrammarManagerImpl();
-		testable.configurationReader = configurationReader;
-		testable.hierarchyManager = hierarchyManager;
+		testable.configurationManager = glrParser.configurationManager;
 	}
 
 	private List<ParseTreeNode> extractParseTreeNodes(List<Token> tokens, Grammar grammar,

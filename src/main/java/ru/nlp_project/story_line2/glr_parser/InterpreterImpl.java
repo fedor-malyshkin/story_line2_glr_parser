@@ -1,8 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,11 +12,9 @@ import javax.inject.Inject;
 
 import org.apache.commons.collections4.Factory;
 import org.apache.commons.collections4.map.LazyMap;
-import org.apache.commons.io.IOUtils;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.FactConfiguration;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.FactConfigurationEntry;
 
 public class InterpreterImpl implements IInterpreter {
 
@@ -91,8 +86,6 @@ public class InterpreterImpl implements IInterpreter {
 
 		String name;
 
-		FactFieldTypes type = FactFieldTypes.STRING;
-
 		String value;
 
 		public FactField cloneEmpty() {
@@ -100,7 +93,6 @@ public class InterpreterImpl implements IInterpreter {
 			result.from = this.from;
 			result.length = this.length;
 			result.name = this.name;
-			result.type = this.type;
 			return result;
 		}
 
@@ -116,9 +108,6 @@ public class InterpreterImpl implements IInterpreter {
 			return name;
 		}
 
-		public FactFieldTypes getType() {
-			return type;
-		}
 
 		public String getValue() {
 			return value;
@@ -126,14 +115,11 @@ public class InterpreterImpl implements IInterpreter {
 
 		@Override
 		public String toString() {
-			return "[" + name + "=" + value + "(" + type + ")]";
+			return "[" + name + "=" + value + "]";
 		}
 
 	}
 
-	enum FactFieldTypes {
-		FIO, NUMBER, STRING;
-	}
 
 	public class FactListFacade extends Fact {
 
@@ -387,7 +373,7 @@ public class InterpreterImpl implements IInterpreter {
 	@Inject
 	public ITokenManager tokenManager;
 	@Inject
-	public ConfigurationReader configurationReader;
+	public IConfigurationManager configurationManager;
 
 	@Inject
 	public InterpreterImpl() {}
@@ -416,14 +402,7 @@ public class InterpreterImpl implements IInterpreter {
 
 	public void initialize() {
 		serializer = ParseTreeSerializer.newInstance(tokenManager);
-		try {
-			InputStream inputStream = configurationReader
-					.getInputStream(configurationReader.getConfigurationMain().factFile);
-			readFactFile(inputStream);
-			IOUtils.closeQuietly(inputStream);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
+		readFact();
 	}
 
 	TreeInterpData newTreeInterpData(int from, int length, String fact, String field,
@@ -502,29 +481,19 @@ public class InterpreterImpl implements IInterpreter {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
-	protected void readFactFile(InputStream inputStream) throws IOException {
+	protected void readFact() {
 		factsMap = new HashMap<String, Fact>();
-		JsonFactory jsonFactory = new JsonFactory();
-		jsonFactory.configure(Feature.ALLOW_COMMENTS, true);
-		ObjectMapper objectMapper = new ObjectMapper(jsonFactory);
-		List<Map<String, Object>> entries = objectMapper.readValue(inputStream, ArrayList.class);
-		for (Map<String, Object> entry : entries) {
-			String name = (String) entry.get("name");
+		FactConfiguration configuration = configurationManager.getFactConfiguration();
+
+
+		for (FactConfigurationEntry entry : configuration.factEntries) {
+			String name = entry.name;
 			if (name == null)
 				throw new IllegalStateException("Fact with no name: " + entry.toString());
 			Fact fact = new Fact(name);
-			List<Map<String, Object>> fieldEntries =
-					(List<Map<String, Object>>) entry.get("fields");
-			for (Map<String, Object> fieldEntry : fieldEntries) {
+			for (String fieldEntry : entry.fields) {
 				FactField field = new FactField();
-				field.name = (String) fieldEntry.get("name");
-				try {
-					field.type = FactFieldTypes.valueOf((String) fieldEntry.get("type"));
-				} catch (IllegalArgumentException e) {
-					throw new IllegalStateException(
-							"Неизвестный тип факта: " + fieldEntry.get("type"));
-				}
+				field.name = fieldEntry;
 				fact.addField(field);
 			}
 			factsMap.put(fact.name, fact);

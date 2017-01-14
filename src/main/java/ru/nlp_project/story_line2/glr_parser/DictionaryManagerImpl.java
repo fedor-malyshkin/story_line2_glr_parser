@@ -1,9 +1,8 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +11,8 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.DictionaryConfiguration;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.DictionaryConfigurationEntry;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 
 /**
@@ -37,8 +34,6 @@ public class DictionaryManagerImpl implements IDictionaryManager {
 	}
 
 	public class DictionaryEntry {
-		String fileAbsolutePath;
-		String grammarAbsolutePath;
 		String name;
 		DictionaryEntryTypes type;
 
@@ -79,31 +74,17 @@ public class DictionaryManagerImpl implements IDictionaryManager {
 		FILE, GRAMMAR, LIST;
 	}
 
-	private static final String KEY_ENTRY_GRAMMAR_FILE = "grammar_file";
-	private static final String KEY_ENTRY_KEYWORDS = "keywords";
-	private static final String KEY_ENTRY_KW_FILE = "keywords_file";
-	private static final String KEY_ENTRY_NAME_NAME = "name";
-	private static final String KEY_ENTRY_OPTIONS = "options";
 	private static final String KEY_ENTRY_TYPE_FILE = "file";
 	private static final String KEY_ENTRY_TYPE_GRAMMAR = "grammar";
 	private static final String KEY_ENTRY_TYPE_LIST = "list";
-	private static final String KEY_ENTRY_TYPE_NAME = "type";
 
 	public void initialize() {
-		InputStream inputStream;
-		try {
-			inputStream = configurationReader
-					.getInputStream(configurationReader.getConfigurationMain().dictionaryFile);
-			readDictionaryFile(inputStream);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-		IOUtils.closeQuietly(inputStream);
+		readDictionaryFile();
 		grammarManager.analyseUsedKewordSets();
 	}
 
 	@Inject
-	public ConfigurationReader configurationReader;
+	public IConfigurationManager configurationManager;
 	private Map<String, DictionaryEntry> dicEntryMap = new HashMap<String, DictionaryEntry>();
 	@Inject
 	public IGrammarManager grammarManager;
@@ -130,87 +111,73 @@ public class DictionaryManagerImpl implements IDictionaryManager {
 		grammarManager.processArticle(context, tokens);
 	}
 
-	@SuppressWarnings("unchecked")
-	protected void readDictionaryFile(InputStream inputStream) throws IOException {
-		JsonFactory jsonFactory = new JsonFactory();
-		jsonFactory.configure(Feature.ALLOW_COMMENTS, true);
-		ObjectMapper objectMapper = new ObjectMapper(jsonFactory);
-		List<Map<String, Object>> entries = objectMapper.readValue(inputStream, ArrayList.class);
-		for (Map<String, Object> entry : entries) {
-			String type = (String) entry.get(KEY_ENTRY_TYPE_NAME);
-			String name = (String) entry.get(KEY_ENTRY_NAME_NAME);
-			if (name == null)
-				throw new IllegalStateException("Article with no name: " + entry.toString());
-			if (dicEntryMap.containsKey(name))
-				throw new IllegalStateException("Double article name: " + name);
+	protected void readDictionaryFile() {
+		DictionaryConfiguration configuration = configurationManager.getDictionaryConfiguration();
 
-			if (type.equalsIgnoreCase(KEY_ENTRY_TYPE_LIST)) {
-				DictionaryEntry dicEntry = readListDictionaryEntry(name, entry);
-				dicEntryMap.put(name, dicEntry);
-			} else if (type.equalsIgnoreCase(KEY_ENTRY_TYPE_FILE)) {
-				DictionaryEntry dicEntry = readFileDictionaryEntry(name, entry);
-				dicEntryMap.put(name, dicEntry);
-			} else if (type.equalsIgnoreCase(KEY_ENTRY_TYPE_GRAMMAR)) {
-				DictionaryEntry dicEntry = readGrammarDictionaryEntry(name, entry);
-				dicEntryMap.put(name, dicEntry);
+		for (DictionaryConfigurationEntry entry : configuration.dictionaryEntries) {
+			if (entry.name == null)
+				throw new IllegalStateException("Article with no name: " + entry.toString());
+			if (dicEntryMap.containsKey(entry.name))
+				throw new IllegalStateException("Double article name: " + entry.name);
+
+			if (entry.type.equalsIgnoreCase(KEY_ENTRY_TYPE_LIST)) {
+				DictionaryEntry dicEntry = readKeywordsListDictionaryEntry(entry.name, entry);
+				dicEntryMap.put(entry.name, dicEntry);
+			} else if (entry.type.equalsIgnoreCase(KEY_ENTRY_TYPE_FILE)) {
+				DictionaryEntry dicEntry = readFileDictionaryEntry(entry.name, entry);
+				dicEntryMap.put(entry.name, dicEntry);
+			} else if (entry.type.equalsIgnoreCase(KEY_ENTRY_TYPE_GRAMMAR)) {
+				DictionaryEntry dicEntry = readGrammarDictionaryEntry(entry.name, entry);
+				dicEntryMap.put(entry.name, dicEntry);
 			}
 		}
 	}
 
-	private DictionaryEntry readFileDictionaryEntry(String name, Map<String, Object> entry) {
-		String keywordsFile = (String) entry.get(KEY_ENTRY_KW_FILE);
+	private DictionaryEntry readFileDictionaryEntry(String name,
+			DictionaryConfigurationEntry entry) {
+		if (entry.keywordsFile == null)
+			throw new IllegalStateException(String.format(
+					"Не указан параметр 'keywords_file' для набора ключевых слов '%s'", name));
+		String keywordsFile = entry.keywordsFile;
 		InputStream streamKW;
 		List<String> keywords;
 		try {
-			streamKW = configurationReader.getInputStream(keywordsFile);
+			String absolutePath = configurationManager.getAbsolutePath(keywordsFile);
+			streamKW = new FileInputStream(absolutePath);
 			keywords = IOUtils.readLines(streamKW);
 		} catch (IOException e) {
 			throw new IllegalStateException(
 					String.format("Ошибка при конфигурировании ключевых слов '%s' из словаря '%s'",
-							name, keywordsFile));
+							name, keywordsFile),
+					e);
 		}
 		IOUtils.closeQuietly(streamKW);
-		String options = (String) entry.get(KEY_ENTRY_OPTIONS);
 		for (int i = 0; i < keywords.size(); i++)
 			keywords.set(i, keywords.get(i).trim());
-		keywordManager.addKeywordSet(name, keywords, entry, options);
+		keywordManager.addKeywordSet(name, keywords, entry.options);
 
 		DictionaryEntry result = new DictionaryEntry(name, DictionaryEntryTypes.FILE);
-		try {
-			result.fileAbsolutePath = configurationReader.getAbsolutePath(keywordsFile);
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException(
-					String.format("Ошибка при конфигурировании ключевых слов '%s' из словаря '%s'",
-							name, keywordsFile));
-		}
 		return result;
 	}
 
-	private DictionaryEntry readGrammarDictionaryEntry(String name, Map<String, Object> entry) {
-		String grammarFile = (String) entry.get(KEY_ENTRY_GRAMMAR_FILE);
+	private DictionaryEntry readGrammarDictionaryEntry(String name,
+			DictionaryConfigurationEntry entry) {
 		try {
-			grammarManager.loadGrammar(name, grammarFile);
+			grammarManager.loadGrammar(name, entry.grammarFile);
 		} catch (IOException e) {
 			throw new IllegalStateException(
 					String.format("Ошибка при конфигурировании грамматики '%s' из словаря '%s'",
-							name, grammarFile));
+							name, entry.grammarFile));
 		}
 		DictionaryEntry result = new DictionaryEntry(name, DictionaryEntryTypes.GRAMMAR);
-		try {
-			result.grammarAbsolutePath = configurationReader.getAbsolutePath(grammarFile);
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException(
-					String.format("Ошибка при конфигурировании грамматики '%s' из словаря '%s'",
-							name, grammarFile));
-		}
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
-	private DictionaryEntry readListDictionaryEntry(String name, Map<String, Object> entry) {
-		List<String> keywords = (List<String>) entry.get(KEY_ENTRY_KEYWORDS);
-		String options = (String) entry.get(KEY_ENTRY_OPTIONS);
-		keywordManager.addKeywordSet(name, keywords, entry, options);
+	private DictionaryEntry readKeywordsListDictionaryEntry(String name,
+			DictionaryConfigurationEntry entry) {
+		List<String> keywords = entry.keywords;
+		String options = entry.options;
+		keywordManager.addKeywordSet(name, keywords, options);
 		return new DictionaryEntry(name, DictionaryEntryTypes.LIST);
 	}
 

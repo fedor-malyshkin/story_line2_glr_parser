@@ -1,0 +1,18 @@
+---
+dictionaries:
+- name: "name0"
+  type: "grammar"
+  grammar_file: "grammar_file.grm"
+  options: "some_val"
+- name: "name1"
+  type: "list"
+  keywords:
+  - "some_keyword"
+  - "some_keyword"
+  - "some_keyword"
+  options: "some_val"
+- name: "name2"
+  type: "file"
+  keywords_file: "keywords_file.kws"
+  options: "some_val"
+

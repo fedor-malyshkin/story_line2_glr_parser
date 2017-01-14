@@ -71,22 +71,20 @@ public class GLRParser {
 	@Deprecated
 	public static boolean invalidatedMorphDB = false;
 
-	public static GLRParser newInstance(String configFile, boolean initMorph) throws IOException {
-		return newInstance(configFile, null, null, initMorph, true);
+	public static GLRParser newInstance(boolean initMorph) throws IOException {
+		return newInstance(null, null, initMorph, true);
 	}
 
-	public static GLRParser newInstance(String configFile, IGLRLogger logger2,
-			IFactListener factListener2, boolean initMorph, boolean multiThread)
-			throws IOException {
-		GLRParser result = new GLRParser(configFile, multiThread);
+	public static GLRParser newInstance(IGLRLogger logger2, IFactListener factListener2,
+			boolean initMorph, boolean multiThread) throws IOException {
+		GLRParser result = new GLRParser(multiThread);
 		result.initialize(logger2, factListener2, initMorph);
 		return result;
 	}
 
-	
 
-	private String configFile;
-	private ConfigurationReader configurationReader;
+	@Inject
+	public IConfigurationManager configurationManager;
 	@Inject
 	public IDictionaryManager dictionaryManager;
 	@Inject
@@ -112,16 +110,12 @@ public class GLRParser {
 		tokenManager.shutdown();
 	}
 
-	private GLRParser(String configFile, boolean multiThread) {
+	private GLRParser(boolean multiThread) {
 		this.multiThread = multiThread;
-		this.configFile = configFile;
 	}
 
 	private synchronized void initialize(IGLRLogger logger2, IFactListener factListener2,
 			boolean initMorph) throws IOException {
-		configurationReader = ConfigurationReader.newInstance(configFile);
-
-
 		IGLRLogger logger = new DefaultGLRLogger();
 		IFactListener factListener = new DefaultFactListener();
 		if (logger2 != null)
@@ -131,11 +125,14 @@ public class GLRParser {
 
 		// inject components
 		ApplicationModule applicationModule =
-				new ApplicationModule(configurationReader, factListener, logger, initMorph);
+				new ApplicationModule(factListener, logger, initMorph);
 		builder = DaggerApplicationComponent.builder().applicationModule(applicationModule).build();
 		builder.inject(this);
-		
-		// initialize components
+
+
+		// configurationManager.initialize();
+		// initialize components (configurationManager was initialized 
+		// in ApplicationModule.provideConfigurationManager)
 		grammarManager.initialize();
 		hierarchyManager.initialize();
 		interpreter.initialize();
@@ -144,7 +141,7 @@ public class GLRParser {
 		sentenceProcessorPool.initialize();
 		nameFinder.initialize();
 		dictionaryManager.initialize();
-		
+
 	}
 
 	/**
@@ -168,7 +165,7 @@ public class GLRParser {
 
 		});
 		if (articles.isEmpty())
-			articles.addAll(configurationReader.getConfigurationMain().articles);
+			articles.addAll(configurationManager.getMasterConfiguration().articles);
 
 		if (multiThread)
 			sentences.parallelStream()

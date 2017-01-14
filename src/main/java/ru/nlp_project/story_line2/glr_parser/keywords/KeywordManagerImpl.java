@@ -21,7 +21,7 @@ import org.apache.commons.lang3.text.StrTokenizer;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 
-import ru.nlp_project.story_line2.glr_parser.ConfigurationReader;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData.SymbolExtDataTypes;
 import ru.nlp_project.story_line2.glr_parser.Token;
 import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl;
@@ -172,13 +172,12 @@ public class KeywordManagerImpl implements IKeywordManager {
 	public static final String KWS_NAME_FIO = "fio";
 
 	@Inject
-	public ConfigurationReader configurationReader = null;
+	public IConfigurationManager configurationManager;
 
 	private List<String> keywordSets = new ArrayList<String>();
-	private Map<String, Map<String, Object>> keywordSetToArgsMap =
-			new HashMap<String, Map<String, Object>>();;
 	private Map<String, PlainKeywordTrie> keywordSetToTrieMap =
 			new HashMap<String, PlainKeywordTrie>();
+
 	@Inject
 	public KeywordManagerImpl() {
 		super();
@@ -223,12 +222,10 @@ public class KeywordManagerImpl implements IKeywordManager {
 	 * String, java.util.List, java.util.Map, java.lang.String)
 	 */
 	@Override
-	public void addKeywordSet(String keywordSetName, List<String> keywords,
-			Map<String, Object> entry, String optionsRaw) {
+	public void addKeywordSet(String keywordSetName, List<String> keywords, String optionsRaw) {
 		if (keywordSets.contains(keywordSetName))
 			throw new IllegalStateException(
 					"Keyword set '" + keywordSetName + "' already added to keyword base.");
-		keywordSetToArgsMap.put(keywordSetName, entry);
 		PlainKeywordTrieBuilder trieBuilder = createPlainKeywordTrieBuilder(keywordSetName);
 		LookupOptions globalOptions = parseLookupOptions(optionsRaw);
 		int counter = 0;
@@ -434,18 +431,7 @@ public class KeywordManagerImpl implements IKeywordManager {
 		return detector.detectPlainKeywordEntrances();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager#getArgsByKeywordSetName(java.
-	 * lang.String)
-	 */
-	@Override
-	public Map<String, Object> getArgsByKeywordSetName(String keywordSetName) {
-		return keywordSetToArgsMap.get(keywordSetName);
 
-	}
 
 	/*
 	 * (non-Javadoc)

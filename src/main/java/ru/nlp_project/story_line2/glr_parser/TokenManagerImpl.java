@@ -1,5 +1,6 @@
 package ru.nlp_project.story_line2.glr_parser;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -195,7 +196,7 @@ public class TokenManagerImpl implements ITokenManager {
 
 	public boolean initMorph;
 	@Inject
-	public ConfigurationReader configurationReader;
+	public IConfigurationManager configurationManager;
 
 	public TokenManagerImpl(boolean initMorph) {
 		this.initMorph = initMorph;
@@ -534,9 +535,9 @@ public class TokenManagerImpl implements ITokenManager {
 
 		try {
 			if (initMorph && (GLRParser.invalidatedMorphDB || morphAnalyser == null)) {
-				String morphZipDB = configurationReader.getConfigurationMain().morphZipDB;
-				morphAnalyser = MorphAnalyser
-						.newInstance(configurationReader.getInputStream(morphZipDB), true);
+				String morphZipDB = configurationManager.getMasterConfiguration().morphZipDB;
+				String absolutePath = configurationManager.getAbsolutePath(morphZipDB);
+				morphAnalyser = MorphAnalyser.newInstance(new FileInputStream(absolutePath), true);
 				GLRParser.invalidatedMorphDB = false;
 			}
 		} catch (IOException e) {

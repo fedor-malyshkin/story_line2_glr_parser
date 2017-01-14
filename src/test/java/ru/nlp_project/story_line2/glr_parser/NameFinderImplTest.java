@@ -1,5 +1,6 @@
 package ru.nlp_project.story_line2.glr_parser;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -20,8 +21,10 @@ public class NameFinderImplTest {
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		String parserConfigDir = TestFixtureBuilder
-				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/TokenManagerTest.zip");
-		glrParser = GLRParser.newInstance(parserConfigDir + "/glr-config.json", true);
+				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/TokenManagerImplTest.zip");
+		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
+				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
+		glrParser = GLRParser.newInstance(true);
 	}
 
 	@Before
@@ -109,7 +112,7 @@ public class NameFinderImplTest {
 
 		testable.preprocessTokens(tokens);
 		// replace first
-		TokenManagerImpl tokenManager = new TokenManagerImpl( false);
+		TokenManagerImpl tokenManager = new TokenManagerImpl(false);
 		tokenManager.initialize();
 		Token token = tokenManager.createDummyFIOKeywordToken("иван");
 		tokens.set(3, token);

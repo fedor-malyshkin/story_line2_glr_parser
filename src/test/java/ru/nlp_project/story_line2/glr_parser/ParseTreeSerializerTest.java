@@ -1,5 +1,6 @@
 package ru.nlp_project.story_line2.glr_parser;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -34,7 +35,9 @@ public class ParseTreeSerializerTest {
 	public static void setUpClass() throws IOException {
 		parserConfigDir = TestFixtureBuilder.unzipToTempDir(
 				"ru/nlp_project/story_line2/glr_parser/ParseTreeSerializerTest.zip");
-		glrParser = GLRParser.newInstance(parserConfigDir + "/glr-config.json", true);
+		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
+				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
+		glrParser = GLRParser.newInstance(true);
 		tokenManager = glrParser.tokenManager;
 		grammarManager = (GrammarManagerImpl) glrParser.grammarManager;
 		keywordManager = glrParser.keywordManager;

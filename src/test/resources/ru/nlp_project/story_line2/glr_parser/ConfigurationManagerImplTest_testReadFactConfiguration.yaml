@@ -1,0 +1,6 @@
+---
+facts:
+- name: "name0"
+  fields: ["grammar", "file"]
+- name: "name1"
+  fields: ["grammar1", "file1"]

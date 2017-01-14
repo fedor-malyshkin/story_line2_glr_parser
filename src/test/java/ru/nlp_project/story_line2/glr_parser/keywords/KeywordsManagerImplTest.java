@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ru.nlp_project.story_line2.glr_parser.GLRParser;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager;
 import ru.nlp_project.story_line2.glr_parser.ISentenceProcessorPool;
 import ru.nlp_project.story_line2.glr_parser.TestFixtureBuilder;
 import ru.nlp_project.story_line2.glr_parser.Token;
@@ -31,8 +33,11 @@ public class KeywordsManagerImplTest {
 	@BeforeClass
 	public static void setUpClass() throws IOException {
 		String parserConfigDir = TestFixtureBuilder
-				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/KeywordsManagerTest.zip");
-		glrParser = GLRParser.newInstance(parserConfigDir + "/glr-config.json", true);
+				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/keywords/KeywordsManagerImplTest.zip");
+		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
+				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
+		glrParser = GLRParser.newInstance(true);
+
 		sentenceProcessorPool = glrParser.sentenceProcessorPool;
 	}
 
@@ -130,7 +135,7 @@ public class KeywordsManagerImplTest {
 	public void testDetectKeywordEntrances() {
 		List<Token> tokens = sentenceProcessorPool.generateTokens("Собака на сене лежала.", false);
 		List<String> kws = Arrays.asList("собака", "собака на сене");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<0;1;0;0(0)>, <0;3;0;1(0)>]", coverage.toString());
@@ -146,12 +151,12 @@ public class KeywordsManagerImplTest {
 	public void testDetectKeywordEntrances_TwiceTheSame() throws IOException {
 		List<Token> tokens = sentenceProcessorPool.generateTokens("Собака на сене лежала.", false);
 		// replace first
-		TokenManagerImpl tokenManager = new TokenManagerImpl( false);
+		TokenManagerImpl tokenManager = new TokenManagerImpl(false);
 		tokenManager.initialize();
 		Token token = tokenManager.createDummyPlainKeywordToken("Собака");
 		tokens.set(0, token);
 		List<String> kws = Arrays.asList("собака", "на сене", "собака на сене");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<1;2;0;1(0)>]", coverage.toString());
@@ -161,7 +166,7 @@ public class KeywordsManagerImplTest {
 	public void testDetectKeywordEntrances_OptionsMainWord() {
 		List<Token> tokens = sentenceProcessorPool.generateTokens("Собака на сене лежала.", false);
 		List<String> kws = Arrays.asList("собака", "собака на сене|-main_word=2");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> entrances =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<0;1;0;0(0)>, <0;3;0;1(2)>]", entrances.toString());
@@ -172,7 +177,7 @@ public class KeywordsManagerImplTest {
 		List<Token> tokens = sentenceProcessorPool
 				.generateTokens("Собака на сене лежала СОБАКА НА СЕНЕ.", false);
 		List<String> kws = Arrays.asList("собака", "собака на сене|-upper_case -main_word=1");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<0;1;0;0(0)>, <4;1;0;0(0)>, <4;3;0;1(1)>]", coverage.toString());
@@ -183,7 +188,7 @@ public class KeywordsManagerImplTest {
 		List<Token> tokens = sentenceProcessorPool
 				.generateTokens("Собаки на сене лежали СОБАКА НА СЕНЕ лежала.", true);
 		List<String> kws = Arrays.asList("собака", "!собаки на сене");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<0;1;0;0(0)>, <0;1;0;0(0)>, <0;3;0;1(0)>, <4;1;0;0(0)>, <4;1;0;0(0)>]",
@@ -196,7 +201,7 @@ public class KeywordsManagerImplTest {
 				.generateTokens("Собаки на сене лежали СОБАКА НА СЕНЕ лежала.", true);
 		List<String> kws = Arrays.asList("собака|-gramm=\"noun, sing\"",
 				"собака на сене|-gramm-1=\"prep, sing\"");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<0;1;0;0(0)>, <0;1;0;0(0)>, <4;1;0;0(0)>, <4;1;0;0(0)>]",
@@ -207,7 +212,7 @@ public class KeywordsManagerImplTest {
 	public void testDetectKeywordEntrances_Gramm_Stali() {
 		List<Token> tokens = sentenceProcessorPool.generateTokens("солдаты стали.", true);
 		List<String> kws = Arrays.asList("солдат стал|-main_word=1 -gramm-1=\"plur, verb\"");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> entrances =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<0;2;0;0(1)>]", entrances.toString());
@@ -220,7 +225,7 @@ public class KeywordsManagerImplTest {
 		List<Token> tokens =
 				sentenceProcessorPool.generateTokens("Лежала Собака на сене долго.", false);
 		List<String> kws = Arrays.asList("собака", "собака на сене");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<1;1;0;0(0)>, <1;3;0;1(0)>]", coverage.toString());
@@ -231,7 +236,7 @@ public class KeywordsManagerImplTest {
 		List<Token> tokens = sentenceProcessorPool
 				.generateTokens("месяцев Саудовская Аравия и Россия провели ", true);
 		List<String> kws = Arrays.asList("саудовский аравия|-main_word=1", "россия");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<1;2;0;0(1)>, <4;1;0;1(0)>, <4;1;0;1(0)>]", coverage.toString());
@@ -241,7 +246,7 @@ public class KeywordsManagerImplTest {
 	public void testDetectKeywordEntrancesInTheTail() {
 		List<Token> tokens = sentenceProcessorPool.generateTokens("Лежала Собака на.", false);
 		List<String> kws = Arrays.asList("собака", "собака на сене");
-		testable.addKeywordSet("simple-kwSet", kws, Collections.emptyMap(), "");
+		testable.addKeywordSet("simple-kwSet", kws, "");
 		List<PlainKeywordEntrance> coverage =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<1;1;0;0(0)>]", coverage.toString());

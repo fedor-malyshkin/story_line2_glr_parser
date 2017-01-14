@@ -55,7 +55,8 @@ class PlainKeywordTrieBuilder {
   }
 
   private int keywordSetId;
-  private String keywordSetName;
+  @SuppressWarnings("unused")
+	private String keywordSetName;
   private PlainKeywordTrie trie;
 
   public PlainKeywordTrieBuilder(int keywordSetId, String keywordSetName) {

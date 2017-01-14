@@ -192,7 +192,7 @@ public class GrammarManagerImpl implements IGrammarManager {
 			new HashMap<String, Collection<String>>();
 
 	@Inject
-	public ConfigurationReader configurationReader;
+	public IConfigurationManager configurationManager;
 
 	private Factory<Map<GrammarDirectiveTypes, Object>> factoryMapSS =
 			new Factory<Map<GrammarDirectiveTypes, Object>>() {
@@ -724,7 +724,7 @@ public class GrammarManagerImpl implements IGrammarManager {
 	}
 
 	private StringWriter readGrammarFileContent(String grammarPath) throws IOException {
-		String absolutePath = configurationReader.getAbsolutePath(grammarPath);
+		String absolutePath = configurationManager.getAbsolutePath(grammarPath);
 		FileInputStream fileInputStream = new FileInputStream(absolutePath);
 		StringWriter grammarFileContent = new StringWriter();
 		IOUtils.copy(fileInputStream, grammarFileContent);

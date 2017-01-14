@@ -1,15 +1,17 @@
 package ru.nlp_project.story_line2.glr_parser.dagger;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import ru.nlp_project.story_line2.glr_parser.ConfigurationReader;
+import ru.nlp_project.story_line2.glr_parser.ConfigurationManagerImpl;
 import ru.nlp_project.story_line2.glr_parser.DictionaryManagerImpl;
 import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl;
 import ru.nlp_project.story_line2.glr_parser.HierarchyManagerImpl;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager;
 import ru.nlp_project.story_line2.glr_parser.IDictionaryManager;
 import ru.nlp_project.story_line2.glr_parser.IFactListener;
 import ru.nlp_project.story_line2.glr_parser.IGLRLogger;
@@ -29,15 +31,12 @@ import ru.nlp_project.story_line2.token.SentenceDetector;
 
 @Module
 public class ApplicationModule {
-	ConfigurationReader configurationReader;
 	boolean initMorph;
 	IFactListener factListener;
 	IGLRLogger logger;
 
-	public ApplicationModule(ConfigurationReader configurationReader, IFactListener factListener,
-			IGLRLogger logger, boolean initMorph) {
+	public ApplicationModule(IFactListener factListener, IGLRLogger logger, boolean initMorph) {
 		super();
-		this.configurationReader = configurationReader;
 		this.factListener = factListener;
 		this.logger = logger;
 		this.initMorph = initMorph;
@@ -45,8 +44,10 @@ public class ApplicationModule {
 
 	@Provides
 	@Singleton
-	ConfigurationReader provideConfigurationReader() {
-		return configurationReader;
+	IConfigurationManager provideConfigurationManager() {
+		ConfigurationManagerImpl instance = new ConfigurationManagerImpl();
+		instance.initialize();
+		return instance;
 	}
 
 	@Provides
@@ -100,14 +101,17 @@ public class ApplicationModule {
 
 	@Provides
 	@Singleton
-	SentenceDetector provideSentenceDetector() {
-		String sentenceData = configurationReader.getConfigurationMain().sentenceData;
+	SentenceDetector provideSentenceDetector(IConfigurationManager configurationManager) {
+		String sentenceData = configurationManager.getMasterConfiguration().sentenceData;
+		String absolutePath = configurationManager.getAbsolutePath(sentenceData);
 		try {
 			SentenceDetector instance =
-					SentenceDetector.newInstance(configurationReader.getInputStream(sentenceData));
+					SentenceDetector.newInstance(new FileInputStream(absolutePath));
 			return instance;
 		} catch (IOException e) {
-			throw new IllegalStateException(e);
+			String message = String.format("Problem with sentence datas: '%s'",
+					configurationManager.getMasterConfiguration().sentenceData);
+			throw new IllegalStateException(message, e);
 		}
 	}
 

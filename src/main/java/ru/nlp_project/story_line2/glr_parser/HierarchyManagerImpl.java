@@ -1,24 +1,18 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.HierarchyConfiguration;
 
 public class HierarchyManagerImpl implements IHierarchyManager {
 
@@ -28,7 +22,7 @@ public class HierarchyManagerImpl implements IHierarchyManager {
 	}
 
 	@Inject
-	public ConfigurationReader configurationReader;
+	public IConfigurationManager configurationManager;
 
 	private Map<String, Set<String>> hierarchiesMap = new TreeMap<>();
 
@@ -37,18 +31,10 @@ public class HierarchyManagerImpl implements IHierarchyManager {
 	}
 
 	public void initialize() {
-		if (configurationReader == null
-				|| configurationReader.getConfigurationMain().hierarchyFile == null)
+		if (configurationManager == null
+				|| configurationManager.getMasterConfiguration().hierarchyFile == null)
 			return;
-		InputStream inputStream = null;
-		try {
-			inputStream = configurationReader
-					.getInputStream(configurationReader.getConfigurationMain().hierarchyFile);
-			readConfigurationFile(inputStream);
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
-		IOUtils.closeQuietly(inputStream);
+		readConfiguration();
 	}
 
 	protected void addConfigurationEntry(String key, List<String> values) {
@@ -89,15 +75,12 @@ public class HierarchyManagerImpl implements IHierarchyManager {
 		} while (wereChanges);
 	}
 
-	@SuppressWarnings("unchecked")
-	protected void readConfigurationFile(InputStream inputStream) throws IOException {
-		JsonFactory jsonFactory = new JsonFactory();
-		jsonFactory.configure(Feature.ALLOW_COMMENTS, true);
-		ObjectMapper objectMapper = new ObjectMapper(jsonFactory);
-		Map<String, Object> entries = objectMapper.readValue(inputStream, HashMap.class);
-		for (Map.Entry<String, Object> entry : entries.entrySet()) {
+	protected void readConfiguration() {
+		HierarchyConfiguration hierarchyConfiguration =
+				configurationManager.getHierarchyConfiguration();
+		for (Entry<String, List<String>> entry : hierarchyConfiguration.hierarchies.entrySet()) {
 			String name = entry.getKey();
-			List<String> values = (List<String>) entry.getValue();
+			List<String> values = entry.getValue();
 			addConfigurationEntry(name, values);
 		}
 	}

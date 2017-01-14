@@ -2,14 +2,13 @@ package ru.nlp_project.story_line2.glr_parser.keywords;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import ru.nlp_project.story_line2.glr_parser.Token;
 
 
 public interface IKeywordManager {
-	default void initialize(){}
-	
+	default void initialize() {}
+
 	/**
 	 * Добавить набор ключевых слов (совместно с опциями) из
 	 * {@link ru.nlp_project.story_line2.glr_parser.DictionaryManagerImpl}.
@@ -17,11 +16,9 @@ public interface IKeywordManager {
 	 * 
 	 * @param keywordSetName имя набора
 	 * @param keywords сами слова
-	 * @param entry ассоциативный массив записи из словаря
 	 * @param optionsRaw опции для всего набора ключевых слов (глобальные)
 	 */
-	void addKeywordSet(String keywordSetName, List<String> keywords, Map<String, Object> entry,
-			String optionsRaw);
+	void addKeywordSet(String keywordSetName, List<String> keywords, String optionsRaw);
 
 	/**
 	 * Рассчитать оптимальное покрытие токенов (предложение) ключевыми словами (с целью максимизации
@@ -71,8 +68,6 @@ public interface IKeywordManager {
 	 */
 	List<PlainKeywordEntrance> detectPlainKeywordEntrances(String keywordSetName,
 			List<Token> tokens);
-
-	Map<String, Object> getArgsByKeywordSetName(String keywordSetName);
 
 	String getKeywordSetsNameByIndex(int index);
 
