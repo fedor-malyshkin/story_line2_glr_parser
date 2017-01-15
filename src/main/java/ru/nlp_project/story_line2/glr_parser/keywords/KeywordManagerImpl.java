@@ -164,7 +164,7 @@ public class KeywordManagerImpl implements IKeywordManager {
 
 			Grammemes result = new Grammemes();
 			GrammemeUtils.fillGrammemesByCSVMyTags(value, result, true);
-			return EnumSet.copyOf(result.getMainGrammems());
+			return EnumSet.copyOf(result.getGrammemes());
 		}
 
 	}

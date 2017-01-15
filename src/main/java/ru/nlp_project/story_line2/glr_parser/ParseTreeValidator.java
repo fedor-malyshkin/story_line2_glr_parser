@@ -243,12 +243,13 @@ public class ParseTreeValidator {
    * <ul>
    * <li>Выполнять проверку для каждого ограничеия и по возможности выполнять лишь вызов метода (в котором выполнять все проверки и изменения);</li>
    * <li>Выполнять проверку {@link Token#lexemes} и данных {@link SymbolExt#getExtDatas()}</li>
-   * <li>Не менять значения граммем ({@link Grammemes}) - т.к. фактически это один и тот же объект во всех деревьях - 
-   * они предназначены лишь для чтения</li>
+
    * <li>При отсуствии данных удовлетворяющих условиям - выбрасывать {@link ParseTreeValidationException}</li>
    * <li>По мере проверки удалять неподходящие граммемы, минимизируя их число и тем самым достигая деомонимизации 
    * (для каждого дерева создается своя копия токенов - допустимо их измениение 
    * (см. {@link ParseTreeNode#ParseTreeNode(ru.nlp_project.story_line2.glr_parser.eval.RNGLRAnalyser.SPPFNode, ParseTreeNode)}))</li>
+   * <li>!!! Не менять значения граммем ({@link Grammemes}) - т.к. фактически это один и тот же объект во всех деревьях - 
+   * они предназначены лишь для чтения</li>
    * </ul>
    * @param token 
    * @param isTerminal 
@@ -287,15 +288,6 @@ public class ParseTreeValidator {
               node.prjPos, node.symbol, entry.getValue(), node.token,
               node.isTerminal,
               "node not match 'gram' restriction: " + entry.getValue());
-        break;
-      case gram_ex:
-        checker.removeUnmatchingLexemesGramEx(entry.getValue().getGrammValue(),
-            symbolExt, node.token);
-        if (node.token.lexemes.size() == 0)
-          throw new ParseTreeValidationException(context.getArticle(),
-              node.prjPos, node.symbol, entry.getValue(), node.token,
-              node.isTerminal,
-              "node not match 'gram-ex' restriction: " + entry.getValue());
         break;
       case gu:
         if (!checker.matchGU(entry.getValue().getGuValue(), symbolExt,

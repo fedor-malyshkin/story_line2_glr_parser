@@ -179,16 +179,16 @@ public class NGLRGrammarBuilderTest {
 
   @Test
   public void testGrammarDirectives_WithGrammEx() {
-    String grammar = "T-> SomeGrammeme<gram-ex=\"sing\">;";
+    String grammar = "T-> SomeGrammeme<gram=\"sing\">;";
     assertEquals(
         "(nglrGrammar (projection (nonTerminal T) -> (nonRegularExpression "
-        + "(nonTerminalExt SomeGrammeme (extData < (extDataParam (extDataParamName gram - ex) = "
+        + "(nonTerminalExt SomeGrammeme (extData < (extDataParam (extDataParamName gram) = "
         + "(extDataParamValue \" sing \")) >))) ;))",
         printTree(grammar));
     parse(grammar, testable);
     Grammar result = testable.getResult();
     assertEquals(1, result.size());
-    assertEquals("T->SomeGrammeme<gram-ex=\"sing\">;", result.toString());
+    assertEquals("T->SomeGrammeme<gram=\"sing\">;", result.toString());
   }
 
   @Test

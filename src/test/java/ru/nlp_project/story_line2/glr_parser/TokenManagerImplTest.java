@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
+import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl.FIOKeywordToken;
 import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl.PlainKeywordToken;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 import ru.nlp_project.story_line2.glr_parser.keywords.PlainKeywordEntrance;
@@ -40,6 +42,28 @@ public class TokenManagerImplTest {
 	@Before
 	public void setUp() {
 		testable = (TokenManagerImpl) glrParser.tokenManager;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testModifyTokensByGrammarKeywordToken() {
+		List<Token> tokens = testable.splitIntoTokens("Фото Дмитрия_Торопова", false);
+		FIOKeywordToken fioToken = testable.createDummyFIOKeywordToken("Дмитрия_Торопова");
+		Token dm = new Token(5, 7, "Дмитрия", TokenTypes.WORD);
+		Token tr = new Token(13, 8, "Торопова", TokenTypes.WORD);
+		fioToken.originalTokens = new LinkedList<>(Arrays.asList(dm, tr));
+		tokens.set(1, fioToken);
+		tokens.remove(2);tokens.remove(2);
+
+		// пострили грамматику для извлечения фактов с FIO-словами
+		ParseTreeNode parseNode = new ParseTreeNode(1, 1, tokens.get(1), null);
+		GrammarKeywordEntrance entrance = new GrammarKeywordEntrance(1, 1, "fios", parseNode);
+		
+		assertEquals(2, tokens.size());
+		// при данном построенном дереве не меняется кол-во токенов
+		testable.modifyTokensByKeywords(tokens, Arrays.asList(entrance));
+		assertEquals(2, tokens.size());
+
 	}
 
 	@Test

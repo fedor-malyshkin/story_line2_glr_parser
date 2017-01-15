@@ -66,6 +66,13 @@ public class GLRParser {
 			this.value = value;
 		}
 
+		@Override
+		public String toString() {
+			return "[(" + index + ") " + start + ":" + length + " '" + value + "']";
+		}
+
+
+
 	}
 
 	@Deprecated
@@ -131,7 +138,7 @@ public class GLRParser {
 
 
 		// configurationManager.initialize();
-		// initialize components (configurationManager was initialized 
+		// initialize components (configurationManager was initialized
 		// in ApplicationModule.provideConfigurationManager)
 		grammarManager.initialize();
 		hierarchyManager.initialize();

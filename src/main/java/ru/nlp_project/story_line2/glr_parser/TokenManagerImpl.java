@@ -313,7 +313,7 @@ public class TokenManagerImpl implements ITokenManager {
 	}
 
 	@Deprecated
-	public Token createDummyFIOKeywordToken(String value) {
+	FIOKeywordToken createDummyFIOKeywordToken(String value) {
 		return new FIOKeywordToken(0, 0, value, Collections.emptyList(), null, null);
 	}
 
@@ -344,6 +344,11 @@ public class TokenManagerImpl implements ITokenManager {
 	private Token createFIOKeywordToken(List<Token> tokens, FIOKeywordEntrance fkw, int diff) {
 		List<Token> subList =
 				tokens.subList(fkw.getFrom() + diff, fkw.getFrom() + fkw.getLength() + diff);
+
+		// делаем копию списка - т.к. метод subList() создаёт зеркало подмножество и мы можем
+		// подпортить реальный список токенов
+		subList = new ArrayList<>(subList);
+
 
 		// сделать список из всех токенов - даже если это другие
 		// PlainKeywordToken/GrammarKeywordToken/FIOKeywordToken
@@ -396,8 +401,13 @@ public class TokenManagerImpl implements ITokenManager {
 	 */
 	private Token createGrammarKeywordToken(List<Token> tokens, GrammarKeywordEntrance gkw,
 			int diff) {
+
 		List<Token> subList =
 				tokens.subList(gkw.getFrom() + diff, gkw.getFrom() + gkw.getLength() + diff);
+
+		// делаем копию списка - т.к. метод subList() создаёт зеркало подмножество и мы можем
+		// подпортить реальный список токенов
+		subList = new ArrayList<>(subList);
 
 		// сделать список из всех токенов - даже если это другие
 		// PlainKeywordToken/GrammarKeywordToken
@@ -433,6 +443,11 @@ public class TokenManagerImpl implements ITokenManager {
 	private Token createPlainKeywordToken(List<Token> tokens, PlainKeywordEntrance pkw, int diff) {
 		List<Token> subList =
 				tokens.subList(pkw.getFrom() + diff, pkw.getFrom() + pkw.getLength() + diff);
+
+		// делаем копию списка - т.к. метод subList() создаёт зеркало подмножество и мы можем
+		// подпортить реальный список токенов
+		subList = new ArrayList<>(subList);
+
 
 		// повторяем полное построение токена в случае наличия леммы для замены в ключевом слове
 		// при этом все дочерние токены (даже если их было несколько) -- игнорируются

@@ -1,7 +1,6 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,40 +27,42 @@ public class SymbolRestrictionCheckerTest {
 	}
 
 	@Test
-	public void testMatchScore_NoAgreements1() {
+	public void testCalculateMatchScore_NoAgreements1() {
 		Grammemes grammemes1 = new Grammemes();
 		Grammemes grammemes2 = new Grammemes();
-		int matchScore = SymbolRestrictionChecker.matchScore(grammemes1, grammemes2, null);
+		int matchScore = SymbolRestrictionChecker.calculateMatchScore(grammemes1, grammemes2, null);
 		assertTrue("matchScore > 0", matchScore > 0);
 	}
 
 	@Test
-	public void testMatchScore_NoAgreements2() {
+	public void testCalculateMatchScore_NoAgreements2() {
 		// {0=noun, 1=nomn, 3=masc, 4=anim, 5=plur}
 		Grammemes grammemes1 = new Grammemes();
 		GrammemeUtils.fillGrammemesByCSVMyTags("noun, nomn, masc, anim, plur", grammemes1, true);
 		// {0=noun, 1=loct, 3=masc, 4=anim, 5=plur}
 		Grammemes grammemes2 = new Grammemes();
 		GrammemeUtils.fillGrammemesByCSVMyTags("noun, loct, masc, anim, plur", grammemes2, true);
-		int matchScoreSame = SymbolRestrictionChecker.matchScore(grammemes1, grammemes1, null);
-		int matchScoreOther = SymbolRestrictionChecker.matchScore(grammemes1, grammemes2, null);
+		int matchScoreSame =
+				SymbolRestrictionChecker.calculateMatchScore(grammemes1, grammemes1, null);
+		int matchScoreOther =
+				SymbolRestrictionChecker.calculateMatchScore(grammemes1, grammemes2, null);
 		assertTrue("matchScoreSame > matchScoreOther", matchScoreSame > matchScoreOther);
 	}
 
 	@Test
-	public void testMatchScore_GN_Agreements() {
+	public void testCalculateMatchScore_GN_Agreements() {
 		// {0=noun, 1=nomn, 3=masc, 4=anim, 5=plur}
 		Grammemes grammemes1 = new Grammemes();
 		GrammemeUtils.fillGrammemesByCSVMyTags("noun, nomn, masc, anim, plur", grammemes1, true);
 		// {0=noun, 1=loct, 3=masc, 4=anim, 5=plur}
 		Grammemes grammemes2 = new Grammemes();
 		GrammemeUtils.fillGrammemesByCSVMyTags("noun, loct, masc, anim, plur", grammemes2, true);
-		int matchScore_Same_GN = SymbolRestrictionChecker.matchScore(grammemes1, grammemes1,
-				SymbolExtDataTypes.gn_agr);
-		int matchScore_Other_GN = SymbolRestrictionChecker.matchScore(grammemes1, grammemes2,
-				SymbolExtDataTypes.gn_agr);
+		int matchScore_Same_GN = SymbolRestrictionChecker.calculateMatchScore(grammemes1,
+				grammemes1, SymbolExtDataTypes.gn_agr);
+		int matchScore_Other_GN = SymbolRestrictionChecker.calculateMatchScore(grammemes1,
+				grammemes2, SymbolExtDataTypes.gn_agr);
 		int matchScore_Other_NoAgree =
-				SymbolRestrictionChecker.matchScore(grammemes1, grammemes2, null);
+				SymbolRestrictionChecker.calculateMatchScore(grammemes1, grammemes2, null);
 		assertTrue("matchScore_Same_GN > matchScore_Other_GN",
 				matchScore_Same_GN > matchScore_Other_GN);
 		assertTrue("matchScore_Other_GN > matchScore_Other_NoAgree",
@@ -98,10 +99,10 @@ public class SymbolRestrictionCheckerTest {
 	 * 
 	 */
 	@Test
-	public void testMatchGrammEx() {
+	public void testMatchGramm() {
 		// symbol ext
 		SymbolExtData symbolExtData1 = SymbolExtData.makeLabelExtData("rt");
-		SymbolExtData symbolExtData2 = SymbolExtData.makeParamExtData("gram-ex", "geox");
+		SymbolExtData symbolExtData2 = SymbolExtData.makeParamExtData("gram", "geox");
 		SymbolExtData symbolExtData3 = SymbolExtData.makeLabelExtData("h-reg1");
 		List<SymbolExtData> symbolExtDatas =
 				Arrays.asList(symbolExtData1, symbolExtData2, symbolExtData3);
@@ -121,7 +122,7 @@ public class SymbolRestrictionCheckerTest {
 		GrammemeUtils.setTag(GrammemeEnum.geox, grms2);
 		token.addLexeme("", "восток", "восток", grms2, true);
 
-		assertTrue(testable.matchGramEx(symbolExtData2.getGrammValue(), symbolExt, token));
+		assertTrue(testable.matchGram(symbolExtData2.getGrammValue(), symbolExt, token));
 	}
 
 	/**
@@ -163,7 +164,7 @@ public class SymbolRestrictionCheckerTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testMatchKWType() throws IOException {
-		TokenManagerImpl tokenManager = new TokenManagerImpl( false);
+		TokenManagerImpl tokenManager = new TokenManagerImpl(false);
 		tokenManager.initialize();
 		PlainKeywordToken pkwt = tokenManager.createDummyPlainKeywordToken();
 		pkwt.kwName = "kwName_toMatch".toLowerCase();
@@ -182,7 +183,7 @@ public class SymbolRestrictionCheckerTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testMatchKWSet() throws IOException {
-		TokenManagerImpl tokenManager = new TokenManagerImpl( false);
+		TokenManagerImpl tokenManager = new TokenManagerImpl(false);
 		tokenManager.initialize();
 		PlainKeywordToken pkwt = tokenManager.createDummyPlainKeywordToken();
 		pkwt.kwName = "kwName_toMatch".toLowerCase();
@@ -370,7 +371,7 @@ public class SymbolRestrictionCheckerTest {
 	}
 
 	@Test
-	public void testRxM() {
+	public void testRx() {
 		// symbol ext
 		SymbolExtData symbolExtData2 = SymbolExtData.makeParamExtData("rx", "им\\..*");
 		List<SymbolExtData> symbolExtDatas = Arrays.asList(symbolExtData2);
@@ -380,4 +381,20 @@ public class SymbolRestrictionCheckerTest {
 		assertTrue(testable.matchRx(symbolExtData2, symbolExt, token));
 	}
 
+
+	@Test
+	public void testRemoveUnmatchingLexemesGram() {
+		SymbolExtData symbolExtData = SymbolExtData.makeParamExtData("gram", "geox");
+		List<SymbolExtData> symbolExtDatas = Arrays.asList(symbolExtData);
+		SymbolExt symbolExt = new SymbolExt("val", SymbolTypes.Terminal, symbolExtDatas);
+
+		Token token = new Token(0, 10, "someVal", TokenTypes.WORD);
+		Grammemes grms = new Grammemes();
+		GrammemeUtils.setTag(GrammemeEnum.noun, grms);
+		GrammemeUtils.setTag(GrammemeEnum.accs, grms);
+
+		token.addLexeme("", "lemm", "base", grms, true);
+		testable.removeUnmatchingLexemesGram(symbolExtData.getGrammValue(), symbolExt, token);
+		assertEquals(0, token.getLexemesListCopy().size());
+	}
 }

@@ -216,7 +216,7 @@ public class KeywordsManagerImplTest {
 		List<PlainKeywordEntrance> entrances =
 				testable.detectPlainKeywordEntrances("simple-kwSet", tokens);
 		assertEquals("[<0;2;0;0(1)>]", entrances.toString());
-		assertEquals("['стал' (verb [verb, past, plur, perf, intr, indc])]",
+		assertEquals("['стал' (verb, past, plur, perf, intr, indc)]",
 				entrances.get(0).mainWordToken.getLexemesListCopy().toString());
 	}
 

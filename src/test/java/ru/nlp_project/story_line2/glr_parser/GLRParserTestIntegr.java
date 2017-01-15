@@ -329,4 +329,24 @@ public class GLRParserTestIntegr {
 				"[artc: absolute_dates][snt-st: 0][fact: TEMPORAL<day_of_week='null'(0,0); absolute_date='четверг 9 июля'(1,3)>]",
 				result);
 	}
+
+	/**
+	 * Проверка отсуствия бага с генерацией новых не нужных токенов при извлечении GrammarKW с FIO.
+	 * Вторая статья "geos" необходима лищь для выявления бага (будет NPE при работе с лексемами
+	 * нового странного токена).
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void testExtractingFios() throws IOException {
+		factSerializer.clear();
+		grammarSerializationLogger.clear();
+
+		testable.processText(Arrays.asList("fios", "geos"), "Фото Дмитрия Торопова");
+
+		String result =
+				factSerializer.factsSerialized.stream().sorted().collect(Collectors.joining("\n"));
+		assertEquals("[artc: fios][snt-st: 0][fact: FIO<FIO='торопова дмитрий'(1,1)>]", result);
+	}
+
 }

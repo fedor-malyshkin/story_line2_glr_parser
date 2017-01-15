@@ -87,8 +87,9 @@ public class SymbolExtData implements Comparable<SymbolExtData> {
     kwtype(100, true, true, true, true), 
     kwtypef(101, true, true, true, true), 
     kwtypel(102, true, true, true, true), 
-    gram(103, true, true, false, true), 
-    gram_ex(104, true, true, false, true), 
+    gram(103, true, true, false, true),
+    // gram_ex was removed
+    // gram_ex(104, true, true, false, true), 
     rx(105, true, true, false, true), 
     rxf(106, true, true, false, true), 
     rxl(107, true, true, false, true),
@@ -359,10 +360,6 @@ public class SymbolExtData implements Comparable<SymbolExtData> {
     switch (paramName.toLowerCase()) {
     case "gram":
       result = new SymbolExtData(SymbolExtDataTypes.gram);
-      result.grammValue = extractGrammemesListValues(paramValue);
-      break;
-    case "gram-ex":
-      result = new SymbolExtData(SymbolExtDataTypes.gram_ex);
       result.grammValue = extractGrammemesListValues(paramValue);
       break;
     case "kwtype":

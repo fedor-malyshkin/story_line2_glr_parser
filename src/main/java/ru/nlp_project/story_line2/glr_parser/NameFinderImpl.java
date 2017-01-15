@@ -30,7 +30,7 @@ import ru.nlp_project.story_line2.morph.WordformAnalysisResult;
  *
  */
 public class NameFinderImpl implements INameFinder {
-	
+
 	@Inject
 	public NameFinderImpl() {
 		super();
@@ -148,13 +148,13 @@ public class NameFinderImpl implements INameFinder {
 			while (wfIter.hasNext()) {
 				WordformAnalysisResult wf = wfIter.next();
 				Grammemes grammemes2 = wf.grammemes;
-				if (grammemes2.has(gramm.getByIndex(GrammemeUtils.CASE_NDX))
-						&& grammemes2.has(gramm.getByIndex(GrammemeUtils.NMBR_NDX))
-						&& grammemes2.has(gramm.getByIndex(GrammemeUtils.GNDR_NDX))) {
+				if (grammemes2.has(gramm.getByGrammemeGroupIndex(GrammemeUtils.CASE_NDX))
+						&& grammemes2.has(gramm.getByGrammemeGroupIndex(GrammemeUtils.NMBR_NDX))
+						&& grammemes2.has(gramm.getByGrammemeGroupIndex(GrammemeUtils.GNDR_NDX))) {
 
 					/*
 					 * if (grammemes2.has(GrammemeEnum.nomn) && grammemes2.has(GrammemeEnum.sing) &&
-					 * grammemes2.has(gramm.getByIndex(GrammemeUtils.GNDR_NDX))) {
+					 * grammemes2.has(gramm.getByGrammemeGroupIndex(GrammemeUtils.GNDR_NDX))) {
 					 */
 					if (!predictedSurname)
 						return wf.value;
@@ -528,14 +528,13 @@ public class NameFinderImpl implements INameFinder {
 
 	private void addSingleSurname(List<Token> tokens, int tokenIndex, List<FIOEntry> foundNames) {
 		Token t = tokens.get(tokenIndex);
-		if (!t.getLexemesListCopy().stream()
-				.anyMatch(l -> l.getGrammemes().hasEx(GrammemeEnum.surn)))
+		if (!t.getLexemesListCopy().stream().anyMatch(l -> l.getGrammemes().has(GrammemeEnum.surn)))
 			return;
 
 		FIOEntry newEntrance = new FIOEntry((FIOTemplate) null);
 		newEntrance.setSurname(t, false, tokenIndex);
 		Lexeme lexeme = t.getLexemesListCopy().stream()
-				.filter(l -> l.getGrammemes().hasEx(GrammemeEnum.surn)).findAny().get();
+				.filter(l -> l.getGrammemes().has(GrammemeEnum.surn)).findAny().get();
 		newEntrance.setSurnameLexemeAndLemm(lexeme, lexeme.getLemm());
 
 		List<FIOEntry> nameVariants = new LinkedList<>();
@@ -589,9 +588,9 @@ public class NameFinderImpl implements INameFinder {
 						return false;
 				}
 				case Name: {
-					if (t.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.name))) {
+					if (t.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.name))) {
 						Lexeme lexeme = t.getLexemesListCopy().stream()
-								.filter(l -> l.hasEx(GrammemeEnum.name)).findAny().get();
+								.filter(l -> l.has(GrammemeEnum.name)).findAny().get();
 						foundName.setNameLexemeAndLemm(lexeme, lexeme.getLemm());
 						foundName.setName(t, false, tokenIndex + i);
 						continue;
@@ -599,9 +598,9 @@ public class NameFinderImpl implements INameFinder {
 						return false;
 				}
 				case Patronomyc: {
-					if (t.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.patr))) {
+					if (t.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.patr))) {
 						Lexeme lexeme = t.getLexemesListCopy().stream()
-								.filter(l -> l.hasEx(GrammemeEnum.patr)).findAny().get();
+								.filter(l -> l.has(GrammemeEnum.patr)).findAny().get();
 						foundName.setPatronomycLexemeAndLemm(lexeme, lexeme.getLemm());
 						foundName.setPatronomyc(t, false, tokenIndex + i);
 						continue;
@@ -610,16 +609,16 @@ public class NameFinderImpl implements INameFinder {
 				}
 				case Surname: {
 					// вначале пытаемся найти словарные фамилии
-					if (t.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.surn))) {
+					if (t.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.surn))) {
 						Lexeme lexeme = t.getLexemesListCopy().stream()
-								.filter(l -> l.hasEx(GrammemeEnum.surn)).findAny().get();
+								.filter(l -> l.has(GrammemeEnum.surn)).findAny().get();
 						foundName.setSurnameLexemeAndLemm(lexeme, lexeme.getLemm());
 						foundName.setSurname(t, false, tokenIndex + i);
 						continue;
 					} else if (predictAsSurname(t)) {
 						// берем даже предсказанные
 						Lexeme lexeme = t.getLexemesListCopy(true).stream()
-								.filter(l -> l.hasEx(GrammemeEnum.surn)).findAny().get();
+								.filter(l -> l.has(GrammemeEnum.surn)).findAny().get();
 						foundName.setSurnameLexemeAndLemm(lexeme, lexeme.getLemm());
 						foundName.setSurname(t, false, tokenIndex + i);
 						foundName.setSurnamePredicted(true);
@@ -649,14 +648,14 @@ public class NameFinderImpl implements INameFinder {
 			// allow Vladimir Putin, Vladimir PUTIN and VLADIMIR PUTIN, but not
 			// VLADIMIR Putin (spike :( )
 			if (tokens.get(iSurnameFromRight).getLexemesListCopy().stream()
-					.anyMatch(l -> l.hasEx(GrammemeEnum.surn))
+					.anyMatch(l -> l.has(GrammemeEnum.surn))
 					&& (upperCase || tokens.get(iSurnameFromRight).isHReg1())) {
 				// так как может быть много омонимов-фамилий(например, Шиховой)
 				Iterator<Lexeme> lexIter =
 						tokens.get(iSurnameFromRight).getLexemesListCopy().iterator();
 				while (lexIter.hasNext()) {
 					Lexeme lexeme = lexIter.next();
-					if (!lexeme.hasEx(GrammemeEnum.surn))
+					if (!lexeme.has(GrammemeEnum.surn))
 						continue;
 					foundName.setSurname(tokens.get(iSurnameFromRight), false, iSurnameFromRight);
 					foundName.setSurnameLexemeAndLemm(lexeme, lexeme.getLemm());
@@ -681,14 +680,14 @@ public class NameFinderImpl implements INameFinder {
 			// also check for closing quote separating Surname from FIO (which is
 			// forbidden)
 			if (tokens.get(iSurnameFromLeft).getLexemesListCopy().stream().anyMatch(
-					l -> l.hasEx(GrammemeEnum.surn)) && !tokens.get(iSurnameFromLeft).isRQuoted()
+					l -> l.has(GrammemeEnum.surn)) && !tokens.get(iSurnameFromLeft).isRQuoted()
 					&& (upperCase || tokens.get(iSurnameFromLeft).isHReg1())) {
 				// так как может быть много омонимов-фамилий(например, Шиховой)
 				Iterator<Lexeme> lexIter =
 						tokens.get(iSurnameFromLeft).getLexemesListCopy().iterator();
 				while (lexIter.hasNext()) {
 					Lexeme lexeme = lexIter.next();
-					if (!lexeme.hasEx(GrammemeEnum.surn))
+					if (!lexeme.has(GrammemeEnum.surn))
 						continue;
 					foundName.setSurname(tokens.get(iSurnameFromLeft), false, iSurnameFromLeft);
 					foundName.setSurnameLexemeAndLemm(lexeme, lexeme.getLemm());
@@ -726,8 +725,8 @@ public class NameFinderImpl implements INameFinder {
 
 		if (foundName.getSurnameLexeme() != null && foundName.getSurname() != null
 				&& !foundName.isSurnameInitials() && foundName.getSurname().getLexemesListCopy()
-						.stream().anyMatch(l -> l.hasEx(GrammemeEnum.surn))) {
-			if (!foundName.getSurnameLexeme().hasEx(GrammemeEnum.adjs)) {
+						.stream().anyMatch(l -> l.has(GrammemeEnum.surn))) {
+			if (!foundName.getSurnameLexeme().has(GrammemeEnum.adjs)) {
 				surnameGrammemes = GrammemeUtils.intersect(
 						foundName.getSurnameLexeme().getGrammemes(), foundName.getGrammemes());
 				surnameGrammemes.leaveOnly(Grammemes.ALL_GNC);
@@ -764,8 +763,8 @@ public class NameFinderImpl implements INameFinder {
 					foundName.getNameLexeme().intersect(foundName.getSurnameLexeme());
 			commonNameSurnameGrammems.leaveOnly(Grammemes.ALL_GNC);
 			// special case
-			if (commonNameSurnameGrammems.hasEx(GrammemeEnum.plur)
-					&& !commonNameSurnameGrammems.hasEx(GrammemeEnum.sing))
+			if (commonNameSurnameGrammems.has(GrammemeEnum.plur)
+					&& !commonNameSurnameGrammems.has(GrammemeEnum.sing))
 				commonNameSurnameGrammems = new Grammemes();
 			resGrammemes = commonNameSurnameGrammems;
 			if (commonNameSurnameGrammems.isEmpty())
@@ -783,8 +782,8 @@ public class NameFinderImpl implements INameFinder {
 			commonNamePatronomycGrammems.leaveOnly(Grammemes.ALL_GNC);
 
 			// special case
-			if (commonNamePatronomycGrammems.hasEx(GrammemeEnum.plur)
-					&& !commonNamePatronomycGrammems.hasEx(GrammemeEnum.sing))
+			if (commonNamePatronomycGrammems.has(GrammemeEnum.plur)
+					&& !commonNamePatronomycGrammems.has(GrammemeEnum.sing))
 				commonNamePatronomycGrammems = new Grammemes();
 
 			resGrammemes = commonNamePatronomycGrammems;
@@ -828,7 +827,7 @@ public class NameFinderImpl implements INameFinder {
 		if (!resGrammemes.has(GrammemeEnum.sing))
 			return false;
 		// do not allow plural FIO (only indeclinable)
-		if (!resGrammemes.hasAllEx(Grammemes.MAJOR_CASES))
+		if (!resGrammemes.hasAll(Grammemes.MAJOR_CASES))
 			resGrammemes.remove(GrammemeEnum.plur);
 
 		foundName.setGrammemes(resGrammemes);
@@ -848,12 +847,12 @@ public class NameFinderImpl implements INameFinder {
 		List<Lexeme> nameLexems = Collections.emptyList();
 		if (entrance.getName() != null)
 			nameLexems = entrance.getName().getLexemesListCopy().stream()
-					.filter(l -> l.hasEx(GrammemeEnum.name)).collect(Collectors.toList());
+					.filter(l -> l.has(GrammemeEnum.name)).collect(Collectors.toList());
 
 		List<Lexeme> surnameLexems = Collections.emptyList();
 		if (entrance.getSurname() != null)
 			surnameLexems = entrance.getSurname().getLexemesListCopy(entrance.isSurnamePredicted())
-					.stream().filter(l -> l.hasEx(GrammemeEnum.surn)).collect(Collectors.toList());
+					.stream().filter(l -> l.has(GrammemeEnum.surn)).collect(Collectors.toList());
 		// name & surname
 		if (nameLexems.size() > 0 && surnameLexems.size() > 0) {
 			for (int i = 0; i < nameLexems.size(); i++)
@@ -1034,7 +1033,7 @@ public class NameFinderImpl implements INameFinder {
 				// справа, а потом выбираем лучшую (при прочих равных - правую)
 				// то мы должны пропустить фамлилию, так двигаемся по предложению слева
 				// направо но если есть омоним имени, то не пропускаем
-				if (token.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.surn))
+				if (token.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.surn))
 						&& template.checkSurnameFromDic) {
 					// но если содержит имя или или отчетсво - не пропускать (или
 					// если-что-то несколняемое)
@@ -1042,10 +1041,10 @@ public class NameFinderImpl implements INameFinder {
 					Iterator<Lexeme> lexemIter = token.getLexemesListCopy().iterator();
 					while (lexemIter.hasNext()) {
 						Lexeme lexeme = lexemIter.next();
-						if (lexeme.hasEx(GrammemeEnum.name))
+						if (lexeme.has(GrammemeEnum.name))
 							hasFirstName = true;
-						if (lexeme.hasEx(GrammemeEnum.name) && lexeme.has(GrammemeEnum.plur))
-							hasFirstName &= lexeme.hasAllEx(Grammemes.MAJOR_CASES);
+						if (lexeme.has(GrammemeEnum.name) && lexeme.has(GrammemeEnum.plur))
+							hasFirstName &= lexeme.hasAll(Grammemes.MAJOR_CASES);
 					}
 					if (!hasFirstName || !token.kwInitial)
 						iW++;
@@ -1203,7 +1202,7 @@ public class NameFinderImpl implements INameFinder {
 			foundName.setSurname(t, false, nextToken);
 			foundName.setSurnamePredicted(true);
 			Optional<Lexeme> lexeme = t.getLexemesListCopy().stream()
-					.filter(l -> l.getGrammemes().hasEx(GrammemeEnum.surn)).findAny();
+					.filter(l -> l.getGrammemes().has(GrammemeEnum.surn)).findAny();
 			if (lexeme.isPresent())
 				foundName.setSurnameLexemeAndLemm(lexeme.get(), lexeme.get().getLemm());
 			else
@@ -1219,7 +1218,7 @@ public class NameFinderImpl implements INameFinder {
 			foundName.setSurname(t, false, prevToken);
 			foundName.setSurnamePredicted(true);
 			Optional<Lexeme> lexeme = t.getLexemesListCopy().stream()
-					.filter(l -> l.getGrammemes().hasEx(GrammemeEnum.surn)).findAny();
+					.filter(l -> l.getGrammemes().has(GrammemeEnum.surn)).findAny();
 			if (lexeme.isPresent())
 				foundName.setSurnameLexemeAndLemm(lexeme.get(), lexeme.get().getLemm());
 			else
@@ -1359,11 +1358,11 @@ public class NameFinderImpl implements INameFinder {
 		if (t.kwInitial)
 			return true;
 		// если даже как предсказанная фамилия ...
-		if (t.getLexemesListCopy(true).stream().anyMatch(l -> l.hasEx(GrammemeEnum.surn)))
+		if (t.getLexemesListCopy(true).stream().anyMatch(l -> l.has(GrammemeEnum.surn)))
 			return true;
-		if (t.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.name)))
+		if (t.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.name)))
 			return true;
-		if (t.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.patr)))
+		if (t.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.patr)))
 			return true;
 		return false;
 	}
@@ -1387,14 +1386,14 @@ public class NameFinderImpl implements INameFinder {
 			return false;
 
 		// если не имя
-		if (!t.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.name)))
+		if (!t.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.name)))
 			return false;
 
 		// проверить послеследующее слово
 		if (index < tokens.size() - 1) {
 			Token t2 = tokens.get(index + 1);
-			if (t2.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.surn))
-					|| t2.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.patr)))
+			if (t2.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.surn))
+					|| t2.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.patr)))
 				return false;
 			if (wordCanBeSurname(tokens, index + 1))
 				return false;
@@ -1474,7 +1473,7 @@ public class NameFinderImpl implements INameFinder {
 		boolean res = false;
 		while (lexemIter.hasNext()) {
 			Lexeme lexeme = lexemIter.next();
-			if (!lexeme.hasEx(GrammemeEnum.surn))
+			if (!lexeme.has(GrammemeEnum.surn))
 				continue;
 
 			if (foundName.getName() != null && !foundName.isNameInitials()) {
@@ -1483,7 +1482,7 @@ public class NameFinderImpl implements INameFinder {
 				boolean hasGNC = common.hasAny(Grammemes.ALL_GENDERS);
 				hasGNC &= common.hasAny(Grammemes.MAJOR_CASES);
 				hasGNC &= common.hasAny(Grammemes.ALL_NUMBERS);
-				commonGrammemes.addAll(common.getAllExGrammems());
+				commonGrammemes.addAll(common.getGrammemes());
 				if (hasGNC) {
 					res = true;
 					break;
@@ -1495,7 +1494,7 @@ public class NameFinderImpl implements INameFinder {
 				filter.add(GrammemeEnum.masc);
 				filter.add(GrammemeEnum.femn);
 				common.leaveOnly(filter);
-				commonGrammemes.addAll(common.getAllExGrammems());
+				commonGrammemes.addAll(common.getGrammemes());
 				if (!common.isEmpty()) {
 					res = true;
 					break;
@@ -1521,14 +1520,14 @@ public class NameFinderImpl implements INameFinder {
 			return false;
 
 
-		if (token.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.surn)))
+		if (token.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.surn)))
 			return true;
 
 		boolean predicted = false;
 		List<SurnameAnalysisResult> sarList = tokenManager.predictAsSurnameAndFillLexemes(token);
 
 		for (SurnameAnalysisResult sar : sarList)
-			if (sar.grammemes.hasEx(GrammemeEnum.surn) || sar.grammemes.hasEx(GrammemeEnum.adj)) {
+			if (sar.grammemes.has(GrammemeEnum.surn) || sar.grammemes.has(GrammemeEnum.adj)) {
 				// если первое попадание - очистить ранее имевшиеся прогнозированные
 				// токены
 				if (!predicted)
@@ -1634,8 +1633,8 @@ public class NameFinderImpl implements INameFinder {
 
 		boolean can = (token.isHReg1() || token.isHReg2()) && textCanBeSurname(token.getValue())
 				&& !token.isLQuoted() && !token.kwInitial
-				&& !token.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.surn))
-				&& !token.getLexemesListCopy().stream().anyMatch(l -> l.hasEx(GrammemeEnum.name))
+				&& !token.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.surn))
+				&& !token.getLexemesListCopy().stream().anyMatch(l -> l.has(GrammemeEnum.name))
 				&& token.getValue().length() > 1 && (token.kwWord || token.kwHyphen);
 
 		return can;

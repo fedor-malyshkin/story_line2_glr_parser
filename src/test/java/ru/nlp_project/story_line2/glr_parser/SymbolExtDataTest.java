@@ -45,7 +45,7 @@ public class SymbolExtDataTest {
     SymbolExtData testable = SymbolExtData.makeParamExtData("gram",
         "\"advb, plur\"");
     assertEquals(SymbolExtDataTypes.gram, testable.getType());
-    assertEquals("advb [advb, plur]", testable.getGrammValue().toString());
+    assertEquals("advb, plur", testable.getGrammValue().toString());
   }
 
   @Test(expected = IllegalStateException.class)
@@ -53,7 +53,7 @@ public class SymbolExtDataTest {
     SymbolExtData testable = SymbolExtData.makeParamExtData("gram",
         "\"advb, plur2\"");
     assertEquals(SymbolExtDataTypes.gram, testable.getType());
-    assertEquals("advb {advb,plur}", testable.getGrammValue().toString());
+    assertEquals("advb,plur", testable.getGrammValue().toString());
   }
 
   @Test
