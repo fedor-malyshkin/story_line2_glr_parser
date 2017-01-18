@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 import ru.nlp_project.story_line2.glr_parser.ParseTreeValidator.ParseTreeValidationException;
 
 public class ParseTreeValidatorTest {
@@ -226,4 +228,24 @@ public class ParseTreeValidatorTest {
 				userRootSymbolNode);
 	}
 
+
+
+	/**
+	 * Был баг, связанный с ростом количества дублирующихся лексем для узлов дерева.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void checkTokenLexemsCountAfterValidation() throws Exception {
+		List<Token> tokens = tokenManager.splitIntoTokens("Фото Дмитрия Иванова", true);
+		int firstSize = tokens.get(0).getLexemesListCopy().size();
+		String grammarText = "Root->S; S->Noun<rt>;";
+		ParseTreeNode userRootSymbolNode =
+				TestFixtureBuilder.createParseTree(grammarText, tokens, grammarManager);
+
+		testable.validateTree(TestFixtureBuilder.createDummySentenceProcessingContext(),
+				userRootSymbolNode);
+
+		assertEquals(firstSize, userRootSymbolNode.getLexemesListCopy().size());
+	}
 }

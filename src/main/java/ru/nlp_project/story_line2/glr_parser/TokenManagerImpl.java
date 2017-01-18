@@ -66,7 +66,7 @@ public class TokenManagerImpl implements ITokenManager {
 		public Token clone() {
 			FIOKeywordToken result = new FIOKeywordToken(from, length, value, originalTokens,
 					(FIOKeywordEntrance) kw, kwName);
-			cloneAttributes(result);
+			cloneAttributesTo(result);
 			return result;
 		}
 
@@ -102,7 +102,7 @@ public class TokenManagerImpl implements ITokenManager {
 		public Token clone() {
 			GrammarKeywordToken result = new GrammarKeywordToken(from, length, value,
 					originalTokens, (GrammarKeywordEntrance) kw, kwName);
-			cloneAttributes(result);
+			cloneAttributesTo(result);
 			return result;
 		}
 
@@ -134,7 +134,7 @@ public class TokenManagerImpl implements ITokenManager {
 		public Token clone() {
 			PlainKeywordToken result = new PlainKeywordToken(from, length, value, originalTokens,
 					(PlainKeywordEntrance) kw, kwName);
-			cloneAttributes(result);
+			cloneAttributesTo(result);
 			return result;
 		}
 	}

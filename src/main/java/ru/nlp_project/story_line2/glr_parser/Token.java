@@ -240,11 +240,16 @@ public class Token {
 
 	public Token clone() {
 		Token result = new Token(this.from, this.length, this.value, this.type);
-		cloneAttributes(result);
+		cloneAttributesTo(result);
 		return result;
 	}
 
-	protected void cloneAttributes(Token result) {
+	/**
+	 * Осуществить копирование аттрибутов обхекта в объект-параметр.
+	 * 
+	 * @param other объект-параметр для копирования в него.
+	 */
+	protected void cloneAttributesTo(Token result) {
 		result.kwName = this.kwName;
 		result.kw = this.kw;
 		// qute

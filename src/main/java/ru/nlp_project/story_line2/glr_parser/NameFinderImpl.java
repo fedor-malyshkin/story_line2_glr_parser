@@ -86,17 +86,22 @@ public class NameFinderImpl implements INameFinder {
 		}
 
 		public FIOEntry(FIOEntry entrance) {
-			cloneAttributes(entrance);
+			cloneAttributesTo(entrance);
 		}
 
 		@Override
 		protected Object clone() throws CloneNotSupportedException {
 			FIOEntry result = new FIOEntry(this.foundBy);
-			result.cloneAttributes(this);
+			result.cloneAttributesTo(this);
 			return result;
 		}
 
-		private void cloneAttributes(FIOEntry other) {
+		/**
+		 * Осуществить копирование аттрибутов обхекта в объект-параметр.
+		 * 
+		 * @param other объект-параметр для копирования в него.
+		 */
+		private void cloneAttributesTo(FIOEntry other) {
 			this.foundBy = other.foundBy;
 			this.surnamePredicted = other.surnamePredicted;
 
@@ -1562,7 +1567,7 @@ public class NameFinderImpl implements INameFinder {
 							Token token = new Token(t.getFrom(),
 									t3.getFrom() + t3.getLength() - t.getFrom(),
 									t.getValue() + t2.getValue() + t3.getValue(), TokenTypes.WORD);
-							token.cloneAttributes(t);
+							token.cloneAttributesTo(t);
 							token.kwHyphen = true;
 							i += 2;
 							t2 = tokens.get(i + 1);
@@ -1583,7 +1588,7 @@ public class NameFinderImpl implements INameFinder {
 						Token token =
 								new Token(t.getFrom(), t2.getFrom() + t2.getLength() - t.getFrom(),
 										t.getValue() + t2.getValue(), TokenTypes.WORD);
-						token.cloneAttributes(t);
+						token.cloneAttributesTo(t);
 						newTokens.add(token);
 						token.kwInitial = true;
 						i += 1;

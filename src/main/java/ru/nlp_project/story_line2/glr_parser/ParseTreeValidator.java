@@ -63,7 +63,7 @@ public class ParseTreeValidator {
     public Token clone() {
       NonTerminalToken result =
           new NonTerminalToken(this.from, this.length, this.value, this.type);
-      cloneAttributes(result);
+      cloneAttributesTo(result);
       return result;
     }
 
@@ -199,11 +199,10 @@ public class ParseTreeValidator {
       NonTerminalToken nonTerminalToken =
           new NonTerminalToken(fCh.from, lCh.from - fCh.from + lCh.length,
               rtChild.token.value, TokenTypes.WORD);
-      rtChild.token.cloneAttributes(nonTerminalToken);
+      // copy attributes and lexems from 'rt'-child
+      rtChild.token.cloneAttributesTo(nonTerminalToken);
       node.token = nonTerminalToken;
 
-      // copy grammemes from 'rt'-child
-      nonTerminalToken.addAllLexemes(rtChild.getLexemesListCopy());
       checkSymbolRestrictions(node.isTerminal, node.token, node);
     }
   }

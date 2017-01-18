@@ -194,6 +194,4 @@ public class ParseTreeSerializerTest {
 		assertEquals("сильные люди поехали из СТД", actual);
 	}
 
-
-
 }
