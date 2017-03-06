@@ -13,7 +13,7 @@ node {
    }
    stage('Assemble') {
       // Run the maven build
-     sh "'${gradleHome}/bin/gradle' -Pstand_type=test ${projectName}:assemble"
+     sh "'${gradleHome}/bin/gradle' --debug -Pstand_type=test ${projectName}:assemble"
    }
    stage('Test') {
       sh "'${gradleHome}/bin/gradle' -Pstand_type=test ${projectName}:test"
