@@ -1,5 +1,6 @@
 package ru.nlp_project.story_line2.glr_parser;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +9,9 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ru.nlp_project.story_line2.config.ConfigurationException;
+
 public interface IConfigurationManager {
-
-	public final static String CONFIGURATION_SYSTEM_KEY =
-			"ru.nlp_project.story_line2.glr_parser.config";
-
 	// To ignore any unknown properties in JSON input without exception:
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	class MasterConfiguration {
@@ -44,6 +43,7 @@ public interface IConfigurationManager {
 	}
 
 	// To ignore any unknown properties in JSON input without exception:
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	class DictionaryConfiguration {
 		@JsonProperty("dictionaries")
 		public List<DictionaryConfigurationEntry> dictionaryEntries = new ArrayList<>();
@@ -105,6 +105,6 @@ public interface IConfigurationManager {
 
 	void initialize();
 
-	String getAbsolutePath(String grammarPath);
+	InputStream getSiblingInputStream(String relativePath) throws ConfigurationException;
 
 }

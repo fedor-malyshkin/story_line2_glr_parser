@@ -1,7 +1,7 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import ru.nlp_project.story_line2.config.ConfigurationException;
 import ru.nlp_project.story_line2.glr_parser.NameFinderImpl.FIOEntry;
 import ru.nlp_project.story_line2.glr_parser.Token.Lexeme;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
@@ -551,11 +552,11 @@ public class TokenManagerImpl implements ITokenManager {
 		try {
 			if (initMorph && (GLRParser.invalidatedMorphDB || morphAnalyser == null)) {
 				String morphZipDB = configurationManager.getMasterConfiguration().morphZipDB;
-				String absolutePath = configurationManager.getAbsolutePath(morphZipDB);
-				morphAnalyser = MorphAnalyser.newInstance(new FileInputStream(absolutePath), true);
+				InputStream is = configurationManager.getSiblingInputStream(morphZipDB);
+				morphAnalyser = MorphAnalyser.newInstance(is, true);
 				GLRParser.invalidatedMorphDB = false;
 			}
-		} catch (IOException e) {
+		} catch (IOException | ConfigurationException e) {
 			throw new IllegalStateException(e);
 		}
 

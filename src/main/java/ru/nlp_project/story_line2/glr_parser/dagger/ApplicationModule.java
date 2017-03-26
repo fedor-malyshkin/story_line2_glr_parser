@@ -1,12 +1,13 @@
 package ru.nlp_project.story_line2.glr_parser.dagger;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import ru.nlp_project.story_line2.config.ConfigurationException;
 import ru.nlp_project.story_line2.glr_parser.ConfigurationManagerImpl;
 import ru.nlp_project.story_line2.glr_parser.DictionaryManagerImpl;
 import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl;
@@ -34,9 +35,12 @@ public class ApplicationModule {
 	boolean initMorph;
 	IFactListener factListener;
 	IGLRLogger logger;
+	String configurationPath;
 
-	public ApplicationModule(IFactListener factListener, IGLRLogger logger, boolean initMorph) {
+	public ApplicationModule(String configurationPath, IFactListener factListener,
+			IGLRLogger logger, boolean initMorph) {
 		super();
+		this.configurationPath = configurationPath;
 		this.factListener = factListener;
 		this.logger = logger;
 		this.initMorph = initMorph;
@@ -45,7 +49,7 @@ public class ApplicationModule {
 	@Provides
 	@Singleton
 	IConfigurationManager provideConfigurationManager() {
-		ConfigurationManagerImpl instance = new ConfigurationManagerImpl();
+		ConfigurationManagerImpl instance = new ConfigurationManagerImpl(configurationPath);
 		instance.initialize();
 		return instance;
 	}
@@ -103,12 +107,11 @@ public class ApplicationModule {
 	@Singleton
 	SentenceDetector provideSentenceDetector(IConfigurationManager configurationManager) {
 		String sentenceData = configurationManager.getMasterConfiguration().sentenceData;
-		String absolutePath = configurationManager.getAbsolutePath(sentenceData);
 		try {
-			SentenceDetector instance =
-					SentenceDetector.newInstance(new FileInputStream(absolutePath));
+			InputStream is = configurationManager.getSiblingInputStream(sentenceData);
+			SentenceDetector instance = SentenceDetector.newInstance(is);
 			return instance;
-		} catch (IOException e) {
+		} catch (IOException | ConfigurationException e) {
 			String message = String.format("Problem with sentence datas: '%s'",
 					configurationManager.getMasterConfiguration().sentenceData);
 			throw new IllegalStateException(message, e);

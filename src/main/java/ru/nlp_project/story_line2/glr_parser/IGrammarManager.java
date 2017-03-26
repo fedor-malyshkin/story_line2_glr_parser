@@ -3,11 +3,12 @@ package ru.nlp_project.story_line2.glr_parser;
 import java.io.IOException;
 import java.util.List;
 
+import ru.nlp_project.story_line2.config.ConfigurationException;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordEntrance;
 
 
 public interface IGrammarManager {
-	default void initialize(){}
+	default void initialize() {}
 
 	/**
 	 * Выполнить анализ грамматик для определения зависимых keyword'ов. Обязательный для выполнения
@@ -53,7 +54,9 @@ public interface IGrammarManager {
 	 * @param articleName
 	 * @param grammarPath
 	 * @throws IOException
+	 * @throws ConfigurationException
 	 */
-	void loadGrammar(String articleName, String grammarPath) throws IOException;
+	void loadGrammar(String articleName, String grammarPath)
+			throws IOException, ConfigurationException;
 
 }

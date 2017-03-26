@@ -1,10 +1,7 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,15 +20,8 @@ public class ConfigurationManagerImplTest {
 
 	@Before
 	public void setUp() throws IOException {
-		InputStream resourceAsStream =
-				Thread.currentThread().getContextClassLoader().getResourceAsStream(
-						"ru/nlp_project/story_line2/glr_parser/ConfigurationManagerImplTest_testReadMasterConfiguration.yaml");
-		File tempFile = File.createTempFile("temp", ".yaml");
-		FileUtils.copyInputStreamToFile(resourceAsStream, tempFile);
-		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
-				tempFile.toURI().toString());
-
-		testable = new ConfigurationManagerImpl();
+		testable = new ConfigurationManagerImpl("classpath://"
+				+ "ru/nlp_project/story_line2/glr_parser/ConfigurationManagerImplTest_testReadMasterConfiguration.yaml");
 		testable.initialize();
 
 	}
@@ -48,13 +38,8 @@ public class ConfigurationManagerImplTest {
 
 	@Test
 	public void testReadDictionaryConfiguration() throws IOException, ConfigurationException {
-		InputStream resourceAsStream =
-				Thread.currentThread().getContextClassLoader().getResourceAsStream(
-						"ru/nlp_project/story_line2/glr_parser/ConfigurationManagerImplTest_testReadDictionaryConfiguration.yaml");
-		File tempFile = File.createTempFile("temp", ".yaml");
-		FileUtils.copyInputStreamToFile(resourceAsStream, tempFile);
-		testable.parentFile = null;
-		testable.getMasterConfiguration().dictionaryFile = tempFile.toString();
+		testable.getMasterConfiguration().dictionaryFile =
+				"ConfigurationManagerImplTest_testReadDictionaryConfiguration.yaml";
 		DictionaryConfiguration dictionaryConfiguration = testable.getDictionaryConfiguration();
 
 		assertNotNull(dictionaryConfiguration);
@@ -63,13 +48,8 @@ public class ConfigurationManagerImplTest {
 
 	@Test
 	public void testReadHierarchyConfiguration() throws IOException, ConfigurationException {
-		InputStream resourceAsStream =
-				Thread.currentThread().getContextClassLoader().getResourceAsStream(
-						"ru/nlp_project/story_line2/glr_parser/ConfigurationManagerImplTest_testReadHierarchyConfiguration.yaml");
-		File tempFile = File.createTempFile("temp", ".yaml");
-		FileUtils.copyInputStreamToFile(resourceAsStream, tempFile);
-		testable.parentFile = null;
-		testable.getMasterConfiguration().hierarchyFile = tempFile.toString();
+		testable.getMasterConfiguration().hierarchyFile =
+				"ConfigurationManagerImplTest_testReadHierarchyConfiguration.yaml";
 		HierarchyConfiguration hierarchyConfiguration = testable.getHierarchyConfiguration();
 
 		assertNotNull(hierarchyConfiguration);
@@ -81,13 +61,8 @@ public class ConfigurationManagerImplTest {
 
 	@Test
 	public void testReadFactConfiguration() throws IOException, ConfigurationException {
-		InputStream resourceAsStream =
-				Thread.currentThread().getContextClassLoader().getResourceAsStream(
-						"ru/nlp_project/story_line2/glr_parser/ConfigurationManagerImplTest_testReadFactConfiguration.yaml");
-		File tempFile = File.createTempFile("temp", ".yaml");
-		FileUtils.copyInputStreamToFile(resourceAsStream, tempFile);
-		testable.parentFile = null;
-		testable.getMasterConfiguration().factFile = tempFile.toString();
+		testable.getMasterConfiguration().factFile =
+				"ConfigurationManagerImplTest_testReadFactConfiguration.yaml";
 		FactConfiguration factConfiguration = testable.getFactConfiguration();
 
 		assertNotNull(factConfiguration);

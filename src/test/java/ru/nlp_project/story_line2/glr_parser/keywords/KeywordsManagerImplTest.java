@@ -1,10 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser.keywords;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +12,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import ru.nlp_project.story_line2.glr_parser.GLRParser;
-import ru.nlp_project.story_line2.glr_parser.IConfigurationManager;
 import ru.nlp_project.story_line2.glr_parser.ISentenceProcessorPool;
 import ru.nlp_project.story_line2.glr_parser.TestFixtureBuilder;
 import ru.nlp_project.story_line2.glr_parser.Token;
@@ -32,11 +30,9 @@ public class KeywordsManagerImplTest {
 
 	@BeforeClass
 	public static void setUpClass() throws IOException {
-		String parserConfigDir = TestFixtureBuilder
-				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/keywords/KeywordsManagerImplTest.zip");
-		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
-				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
-		glrParser = GLRParser.newInstance(true);
+		String parserConfigDir = TestFixtureBuilder.unzipToTempDir(
+				"ru/nlp_project/story_line2/glr_parser/keywords/KeywordsManagerImplTest.zip");
+		glrParser = GLRParser.newInstance("file://" + parserConfigDir + "/glr-config.yaml", true);
 
 		sentenceProcessorPool = glrParser.sentenceProcessorPool;
 	}

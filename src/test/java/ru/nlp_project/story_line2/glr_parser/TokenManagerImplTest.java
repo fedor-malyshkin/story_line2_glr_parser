@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -34,9 +33,7 @@ public class TokenManagerImplTest {
 	public static void setUpClass() throws IOException {
 		String parserConfigDir = TestFixtureBuilder
 				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/TokenManagerImplTest.zip");
-		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
-				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
-		glrParser = GLRParser.newInstance(false);
+		glrParser = GLRParser.newInstance("file://" + parserConfigDir + "/glr-config.yaml", false);
 	}
 
 	@Before

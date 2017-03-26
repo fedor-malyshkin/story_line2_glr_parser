@@ -1,6 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 
+import ru.nlp_project.story_line2.config.ConfigurationException;
 import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.DictionaryConfiguration;
 import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.DictionaryConfigurationEntry;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
@@ -139,19 +139,17 @@ public class DictionaryManagerImpl implements IDictionaryManager {
 			throw new IllegalStateException(String.format(
 					"Не указан параметр 'keywords_file' для набора ключевых слов '%s'", name));
 		String keywordsFile = entry.keywordsFile;
-		InputStream streamKW;
 		List<String> keywords;
 		try {
-			String absolutePath = configurationManager.getAbsolutePath(keywordsFile);
-			streamKW = new FileInputStream(absolutePath);
-			keywords = IOUtils.readLines(streamKW);
-		} catch (IOException e) {
+			InputStream is = configurationManager.getSiblingInputStream(keywordsFile);
+			keywords = IOUtils.readLines(is);
+			IOUtils.closeQuietly(is);
+		} catch (IOException | ConfigurationException e) {
 			throw new IllegalStateException(
 					String.format("Ошибка при конфигурировании ключевых слов '%s' из словаря '%s'",
 							name, keywordsFile),
 					e);
 		}
-		IOUtils.closeQuietly(streamKW);
 		for (int i = 0; i < keywords.size(); i++)
 			keywords.set(i, keywords.get(i).trim());
 		keywordManager.addKeywordSet(name, keywords, entry.options);
@@ -164,7 +162,7 @@ public class DictionaryManagerImpl implements IDictionaryManager {
 			DictionaryConfigurationEntry entry) {
 		try {
 			grammarManager.loadGrammar(name, entry.grammarFile);
-		} catch (IOException e) {
+		} catch (IOException | ConfigurationException e) {
 			throw new IllegalStateException(
 					String.format("Ошибка при конфигурировании грамматики '%s' из словаря '%s'",
 							name, entry.grammarFile));

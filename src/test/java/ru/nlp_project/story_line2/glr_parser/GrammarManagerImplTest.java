@@ -1,6 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +18,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import ru.nlp_project.story_line2.config.ConfigurationException;
 import ru.nlp_project.story_line2.glr_parser.GrammarManagerImpl.GrammarDirectiveTypes;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
 import ru.nlp_project.story_line2.glr_parser.eval.Grammar;
@@ -37,9 +37,7 @@ public class GrammarManagerImplTest {
 	public static void setUpClass() throws IOException {
 		parserConfigDir = TestFixtureBuilder
 				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/GrammarManagerImplTest.zip");
-		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
-				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
-		glrParser = GLRParser.newInstance(true);
+		glrParser = GLRParser.newInstance("file://" + parserConfigDir + "/glr-config.yaml", true);
 		tokenManager = glrParser.tokenManager;
 	}
 
@@ -66,7 +64,7 @@ public class GrammarManagerImplTest {
 	}
 
 	@Test
-	public void testAnalyseUsedKewordSets() throws IOException {
+	public void testAnalyseUsedKewordSets() throws IOException, ConfigurationException {
 		testable.loadGrammar("1testArticle", "1main_grammar_file.grm");
 		testable.loadGrammar("2testArticle", "2main_grammar_file.grm");
 
@@ -148,7 +146,7 @@ public class GrammarManagerImplTest {
 	}
 
 	@Test
-	public void testLoadGrammar() throws IOException {
+	public void testLoadGrammar() throws IOException, ConfigurationException {
 		testable.loadGrammar("1testArticle", "1main_grammar_file.grm");
 		testable.loadGrammar("1testArticle", "1main_grammar_file.grm");
 		assertEquals(

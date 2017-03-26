@@ -1,6 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -110,9 +109,8 @@ public class GLRParserTestIntegr {
 
 		parserConfigDir = TestFixtureBuilder
 				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/GLRParserTestIntegr.zip");
-		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
-				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
-		testable = GLRParser.newInstance(grammarSerializationLogger, factSerializer, true, false);
+		testable = GLRParser.newInstance("file://" + parserConfigDir + "/glr-config.yaml",
+				grammarSerializationLogger, factSerializer, true, false);
 	}
 
 	@Test

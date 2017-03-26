@@ -1,7 +1,7 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +22,7 @@ import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.collections4.map.LazyMap;
 import org.apache.commons.io.IOUtils;
 
+import ru.nlp_project.story_line2.config.ConfigurationException;
 import ru.nlp_project.story_line2.glr_parser.ParseTreeValidator.ParseTreeValidationException;
 import ru.nlp_project.story_line2.glr_parser.eval.ActionRecord;
 import ru.nlp_project.story_line2.glr_parser.eval.FullMorphTokenMatcher;
@@ -498,7 +499,8 @@ public class GrammarManagerImpl implements IGrammarManager {
 	 * java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
-	public void loadGrammar(String articleName, String grammarPath) throws IOException {
+	public void loadGrammar(String articleName, String grammarPath)
+			throws IOException, ConfigurationException {
 		StringWriter grammarText = readGrammarFileContent(grammarPath);
 		NGLRGrammarProcessor grammarProcessor = new NGLRGrammarProcessor();
 		// shallow processing
@@ -681,11 +683,14 @@ public class GrammarManagerImpl implements IGrammarManager {
 
 	/**
 	 * Вызывается в случае наличия INCLUDE-директив в корневой грамматике.
+	 * 
+	 * @throws ConfigurationException
 	 */
 	@SuppressWarnings("unchecked")
 	private void processIncludeDirectives(NGLRGrammarProcessor grammarProcessor,
 			List<String> includes, Grammar grammar,
-			Map<GrammarDirectiveTypes, Object> grammarDirectives) throws IOException {
+			Map<GrammarDirectiveTypes, Object> grammarDirectives)
+			throws IOException, ConfigurationException {
 		for (String include : includes) {
 			StringWriter grammarText = readGrammarFileContent(include);
 			// shallow processing
@@ -723,12 +728,12 @@ public class GrammarManagerImpl implements IGrammarManager {
 		}
 	}
 
-	private StringWriter readGrammarFileContent(String grammarPath) throws IOException {
-		String absolutePath = configurationManager.getAbsolutePath(grammarPath);
-		FileInputStream fileInputStream = new FileInputStream(absolutePath);
+	private StringWriter readGrammarFileContent(String grammarPath)
+			throws IOException, ConfigurationException {
+		InputStream is = configurationManager.getSiblingInputStream(grammarPath);
 		StringWriter grammarFileContent = new StringWriter();
-		IOUtils.copy(fileInputStream, grammarFileContent);
-		IOUtils.closeQuietly(fileInputStream);
+		IOUtils.copy(is, grammarFileContent);
+		IOUtils.closeQuietly(is);
 		return grammarFileContent;
 	}
 }

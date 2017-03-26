@@ -78,14 +78,16 @@ public class GLRParser {
 	@Deprecated
 	public static boolean invalidatedMorphDB = false;
 
-	public static GLRParser newInstance(boolean initMorph) throws IOException {
-		return newInstance(null, null, initMorph, true);
+	public static GLRParser newInstance(String configurationPath, boolean initMorph)
+			throws IOException {
+		return newInstance(configurationPath, null, null, initMorph, true);
 	}
 
-	public static GLRParser newInstance(IGLRLogger logger2, IFactListener factListener2,
-			boolean initMorph, boolean multiThread) throws IOException {
+	public static GLRParser newInstance(String configurationPath, IGLRLogger logger2,
+			IFactListener factListener2, boolean initMorph, boolean multiThread)
+			throws IOException {
 		GLRParser result = new GLRParser(multiThread);
-		result.initialize(logger2, factListener2, initMorph);
+		result.initialize(configurationPath, logger2, factListener2, initMorph);
 		return result;
 	}
 
@@ -121,8 +123,8 @@ public class GLRParser {
 		this.multiThread = multiThread;
 	}
 
-	private synchronized void initialize(IGLRLogger logger2, IFactListener factListener2,
-			boolean initMorph) throws IOException {
+	private synchronized void initialize(String configurationPath, IGLRLogger logger2,
+			IFactListener factListener2, boolean initMorph) throws IOException {
 		IGLRLogger logger = new DefaultGLRLogger();
 		IFactListener factListener = new DefaultFactListener();
 		if (logger2 != null)
@@ -132,7 +134,7 @@ public class GLRParser {
 
 		// inject components
 		ApplicationModule applicationModule =
-				new ApplicationModule(factListener, logger, initMorph);
+				new ApplicationModule(configurationPath, factListener, logger, initMorph);
 		builder = DaggerApplicationComponent.builder().applicationModule(applicationModule).build();
 		builder.inject(this);
 

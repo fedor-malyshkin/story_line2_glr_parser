@@ -1,6 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -22,9 +21,7 @@ public class NameFinderImplTest {
 	public static void setUpClass() throws IOException {
 		String parserConfigDir = TestFixtureBuilder
 				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/TokenManagerImplTest.zip");
-		System.setProperty(IConfigurationManager.CONFIGURATION_SYSTEM_KEY,
-				new File(parserConfigDir + "/glr-config.yaml").toURI().toString());
-		glrParser = GLRParser.newInstance(true);
+		glrParser = GLRParser.newInstance("file://" + parserConfigDir + "/glr-config.yaml", true);
 	}
 
 	@Before
