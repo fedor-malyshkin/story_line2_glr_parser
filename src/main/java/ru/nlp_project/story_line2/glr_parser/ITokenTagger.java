@@ -6,4 +6,6 @@ public interface ITokenTagger {
 
 	void processTokens(List<Token> tokens);
 
+	void initialize();
+
 }

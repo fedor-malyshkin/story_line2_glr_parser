@@ -27,6 +27,7 @@ import ru.nlp_project.story_line2.glr_parser.InterpreterImpl;
 import ru.nlp_project.story_line2.glr_parser.NameFinderImpl;
 import ru.nlp_project.story_line2.glr_parser.SentenceProcessorPoolImpl;
 import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl;
+import ru.nlp_project.story_line2.glr_parser.TokenTaggerImpl;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 import ru.nlp_project.story_line2.glr_parser.keywords.KeywordManagerImpl;
 import ru.nlp_project.story_line2.token.SentenceDetector;

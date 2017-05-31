@@ -6,9 +6,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import ru.nlp_project.story_line2.glr_parser.dagger.DaggerGLRParserComponent;
 import ru.nlp_project.story_line2.glr_parser.dagger.GLRParserComponent;
 import ru.nlp_project.story_line2.glr_parser.dagger.GLRParserModule;
-import ru.nlp_project.story_line2.glr_parser.dagger.DaggerApplicationComponent;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 import ru.nlp_project.story_line2.token.ISentenceDetectorListener;
 import ru.nlp_project.story_line2.token.SentenceDetector;
@@ -110,6 +110,8 @@ public class GLRParser {
 	@Inject
 	public ITokenManager tokenManager;
 	@Inject
+	public ITokenTagger tokenTagger;
+	@Inject
 	public ISentenceProcessorPool sentenceProcessorPool;
 	@Inject
 	public INameFinder nameFinder;
@@ -136,7 +138,7 @@ public class GLRParser {
 		// inject components
 		GLRParserModule applicationModule =
 				new GLRParserModule(configurationPath, factListener, logger, initMorph);
-		builder = DaggerApplicationComponent.builder().applicationModule(applicationModule).build();
+		builder = DaggerGLRParserComponent.builder().gLRParserModule(applicationModule).build();
 		builder.inject(this);
 
 
@@ -151,7 +153,7 @@ public class GLRParser {
 		sentenceProcessorPool.initialize();
 		nameFinder.initialize();
 		dictionaryManager.initialize();
-
+		tokenTagger.initialize();
 	}
 
 	/**

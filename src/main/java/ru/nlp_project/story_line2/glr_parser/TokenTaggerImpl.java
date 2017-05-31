@@ -1,12 +1,8 @@
-package ru.nlp_project.story_line2.glr_parser.dagger;
+package ru.nlp_project.story_line2.glr_parser;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import ru.nlp_project.story_line2.glr_parser.IConfigurationManager;
-import ru.nlp_project.story_line2.glr_parser.ITokenTagger;
-import ru.nlp_project.story_line2.glr_parser.Token;
 
 public class TokenTaggerImpl implements ITokenTagger {
 	@Inject
@@ -23,5 +19,14 @@ public class TokenTaggerImpl implements ITokenTagger {
 		// TODO Auto-generated method stub
 
 	}
+
+
+	@Override
+	public void initialize() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 
 }
