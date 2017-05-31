@@ -24,6 +24,8 @@ public interface IConfigurationManager {
 		public String sentenceData;
 		@JsonProperty("glr_parser.morph_zip_db")
 		public String morphZipDB;
+		@JsonProperty("glr_parser.tagger_zip_db")
+		public String taggerZipDB;
 		@JsonProperty("glr_parser.articles")
 		public List<String> articles;
 		@JsonProperty("glr_parser.fact_file")
@@ -35,11 +37,9 @@ public interface IConfigurationManager {
 		public String toString() {
 			return "MasterConfiguration [debug=" + debug + ", dictionaryFile=" + dictionaryFile
 					+ ", sentenceData=" + sentenceData + ", morphZipDB=" + morphZipDB
-					+ ", articles=" + articles + ", factFile=" + factFile + ", hierarchyFile="
-					+ hierarchyFile + "]";
+					+ ", taggerZipDB=" + taggerZipDB + ", articles=" + articles + ", factFile="
+					+ factFile + ", hierarchyFile=" + hierarchyFile + "]";
 		}
-
-
 	}
 
 	// To ignore any unknown properties in JSON input without exception:

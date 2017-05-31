@@ -1,14 +1,11 @@
 package ru.nlp_project.story_line2.glr_parser.grammar_parser;
 
-import static org.junit.Assert.assertEquals;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Test;
 
-import ru.nlp_project.story_line2.glr_parser.grammar_parser.NGLRLexer;
-import ru.nlp_project.story_line2.glr_parser.grammar_parser.NGLRParser;
+import static org.junit.Assert.assertEquals;
 
 public class NGLRParserTest {
 

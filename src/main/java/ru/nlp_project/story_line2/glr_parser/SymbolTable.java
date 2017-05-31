@@ -9,7 +9,7 @@ import java.util.Set;
 import org.apache.commons.lang3.EnumUtils;
 
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 
 /**
  * @author fedor

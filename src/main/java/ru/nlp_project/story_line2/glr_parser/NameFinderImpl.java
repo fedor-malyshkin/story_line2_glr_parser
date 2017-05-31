@@ -18,8 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import ru.nlp_project.story_line2.glr_parser.Token.Lexeme;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.GrammemeUtils;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.Grammemes;
 import ru.nlp_project.story_line2.morph.MorphAnalyser;
 import ru.nlp_project.story_line2.morph.SurnameAnalysisResult;

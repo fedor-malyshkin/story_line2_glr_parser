@@ -1,7 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser.eval;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,14 +13,16 @@ import org.apache.commons.collections4.map.LazyMap;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 import ru.nlp_project.story_line2.glr_parser.HierarchyManagerImpl;
 import ru.nlp_project.story_line2.glr_parser.SymbolExt;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData;
 import ru.nlp_project.story_line2.glr_parser.Token;
 import ru.nlp_project.story_line2.glr_parser.Token.TokenTypes;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol.SymbolTypes;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.GrammemeUtils;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.Grammemes;
 
 public class FullMorphTokenMatcherTest {

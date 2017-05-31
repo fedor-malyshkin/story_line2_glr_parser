@@ -1,9 +1,9 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 import ru.nlp_project.story_line2.glr_parser.eval.Grammar;
 

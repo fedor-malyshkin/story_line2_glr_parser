@@ -1,11 +1,11 @@
 package ru.nlp_project.story_line2.glr_parser.keywords;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 import ru.nlp_project.story_line2.glr_parser.keywords.PlainKeywordTrieBuilder.KeywordInfo;
 

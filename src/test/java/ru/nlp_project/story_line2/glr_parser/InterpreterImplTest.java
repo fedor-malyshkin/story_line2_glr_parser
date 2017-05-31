@@ -3,6 +3,7 @@ package ru.nlp_project.story_line2.glr_parser;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

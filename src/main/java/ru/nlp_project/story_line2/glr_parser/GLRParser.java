@@ -6,8 +6,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import ru.nlp_project.story_line2.glr_parser.dagger.ApplicationComponent;
-import ru.nlp_project.story_line2.glr_parser.dagger.ApplicationModule;
+import ru.nlp_project.story_line2.glr_parser.dagger.GLRParserComponent;
+import ru.nlp_project.story_line2.glr_parser.dagger.GLRParserModule;
 import ru.nlp_project.story_line2.glr_parser.dagger.DaggerApplicationComponent;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 import ru.nlp_project.story_line2.token.ISentenceDetectorListener;
@@ -20,7 +20,8 @@ import ru.nlp_project.story_line2.token.SentenceDetector;
  * каждого предложения в {@link #processText(List, String)}. При этом необходимо учитывать, что все
  * компоненты анализа (те что создаются, конфигурируются и инициализируются в методе
  * {@link #initialize(boolean, IGLRLogger, IFactListener)}) не должны хранить своё состояние внутри
- * себя - лишь передавать структуры с состоянием между вызовами (т.е. быть stateless). <br/>
+ * себя - лишь передавать структуры с состоянием между вызовами (т.е. быть stateless).
+ * <p/>
  * MULTITHREAD_SAFE: YES
  * 
  * @author fedor
@@ -113,7 +114,7 @@ public class GLRParser {
 	@Inject
 	public INameFinder nameFinder;
 	private boolean multiThread;
-	public static ApplicationComponent builder;
+	public static GLRParserComponent builder;
 
 	public void shutdown() {
 		tokenManager.shutdown();
@@ -133,8 +134,8 @@ public class GLRParser {
 			factListener = factListener2;
 
 		// inject components
-		ApplicationModule applicationModule =
-				new ApplicationModule(configurationPath, factListener, logger, initMorph);
+		GLRParserModule applicationModule =
+				new GLRParserModule(configurationPath, factListener, logger, initMorph);
 		builder = DaggerApplicationComponent.builder().applicationModule(applicationModule).build();
 		builder.inject(this);
 

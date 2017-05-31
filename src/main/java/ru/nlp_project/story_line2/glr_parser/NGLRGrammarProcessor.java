@@ -23,7 +23,7 @@ import ru.nlp_project.story_line2.glr_parser.grammar_parser.NGLRGrammarBuilder;
 import ru.nlp_project.story_line2.glr_parser.grammar_parser.NGLRLexer;
 import ru.nlp_project.story_line2.glr_parser.grammar_parser.NGLRParser;
 import ru.nlp_project.story_line2.glr_parser.grammar_parser.ThrowISEErrorListener;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 
 /**
  * 

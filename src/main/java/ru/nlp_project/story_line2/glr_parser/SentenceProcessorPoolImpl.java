@@ -28,6 +28,8 @@ public class SentenceProcessorPoolImpl implements ISentenceProcessorPool {
 	public INameFinder nameFinder;
 	@Inject
 	public IKeywordManager keywordManager;
+	@Inject
+	public ITokenTagger tokenTagger;
 
 
 	/*
@@ -65,6 +67,9 @@ public class SentenceProcessorPoolImpl implements ISentenceProcessorPool {
 		logger.startSentenceProcessing(sentence, articles);
 		List<Token> tokens = tokenManager.splitIntoTokens(sentence.value, true);
 		logger.tokensGenerated(tokens);
+		// запустить таггер
+		tokenTagger.processTokens(tokens);
+		logger.tokensTaggerProcessed(tokens);
 		// произвести предварительную обработку (частичную склейку) токенов
 		nameFinder.preprocessTokens(tokens);
 		logger.tokenNamesGenerated(tokens);

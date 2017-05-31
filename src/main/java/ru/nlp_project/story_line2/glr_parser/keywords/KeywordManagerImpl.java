@@ -25,8 +25,8 @@ import ru.nlp_project.story_line2.glr_parser.IConfigurationManager;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData.SymbolExtDataTypes;
 import ru.nlp_project.story_line2.glr_parser.Token;
 import ru.nlp_project.story_line2.glr_parser.TokenManagerImpl;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.GrammemeUtils;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.Grammemes;
 
 /**

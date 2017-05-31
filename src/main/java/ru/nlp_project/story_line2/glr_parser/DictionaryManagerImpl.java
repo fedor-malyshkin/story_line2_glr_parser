@@ -142,7 +142,7 @@ public class DictionaryManagerImpl implements IDictionaryManager {
 		List<String> keywords;
 		try {
 			InputStream is = configurationManager.getSiblingInputStream(keywordsFile);
-			keywords = IOUtils.readLines(is);
+			keywords = IOUtils.readLines(is, "UTF-8");
 			IOUtils.closeQuietly(is);
 		} catch (IOException | ConfigurationException e) {
 			throw new IllegalStateException(

@@ -1,7 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser.eval;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +8,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 import ru.nlp_project.story_line2.glr_parser.eval.RNGLRAnalyser.SPPFNode;
 import ru.nlp_project.story_line2.glr_parser.eval.SPPFDecomposer.ISPPFTreeWalker;

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ru.nlp_project.story_line2.glr_parser.SymbolExt;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 
 /**
  * Символы грамматики (либо терминалы, либо нетерминалы).

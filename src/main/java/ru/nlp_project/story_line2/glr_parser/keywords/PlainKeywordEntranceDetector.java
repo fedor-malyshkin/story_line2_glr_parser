@@ -14,7 +14,7 @@ import ru.nlp_project.story_line2.glr_parser.SymbolRestrictionChecker;
 import ru.nlp_project.story_line2.glr_parser.Token;
 import ru.nlp_project.story_line2.glr_parser.Token.Lexeme;
 import ru.nlp_project.story_line2.glr_parser.keywords.PlainKeywordTrieBuilder.KeywordInfo;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 
 /**
  * MULTITHREAD_SAFE: FALSE

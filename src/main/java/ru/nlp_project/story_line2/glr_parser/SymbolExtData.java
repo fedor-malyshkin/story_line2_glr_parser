@@ -8,8 +8,8 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.GrammemeUtils;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.Grammemes;
 
 public class SymbolExtData implements Comparable<SymbolExtData> {

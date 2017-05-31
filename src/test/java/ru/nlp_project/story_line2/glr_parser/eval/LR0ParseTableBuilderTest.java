@@ -9,13 +9,10 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import ru.nlp_project.story_line2.glr_parser.TestFixtureBuilder;
-import ru.nlp_project.story_line2.glr_parser.eval.Grammar;
-import ru.nlp_project.story_line2.glr_parser.eval.LR0ParseTableBuilder;
-import ru.nlp_project.story_line2.glr_parser.eval.LR0Point;
-import ru.nlp_project.story_line2.glr_parser.eval.Symbol;
-import ru.nlp_project.story_line2.glr_parser.eval.Symbol.SymbolTypes;
 import static org.junit.Assert.assertEquals;
+
+import ru.nlp_project.story_line2.glr_parser.TestFixtureBuilder;
+import ru.nlp_project.story_line2.glr_parser.eval.Symbol.SymbolTypes;
 
 public class LR0ParseTableBuilderTest {
 

@@ -14,8 +14,8 @@ import com.beust.jcommander.Parameters;
 import ru.nlp_project.story_line2.glr_parser.SymbolExtData.SymbolExtDataTypes;
 import ru.nlp_project.story_line2.glr_parser.keywords.KeywordManagerImpl.OptionAgrConverter;
 import ru.nlp_project.story_line2.glr_parser.keywords.KeywordManagerImpl.OptionGrammConverter;
+import ru.nlp_project.story_line2.morph.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.GrammemeUtils;
-import ru.nlp_project.story_line2.morph.GrammemeUtils.GrammemeEnum;
 import ru.nlp_project.story_line2.morph.Grammemes;
 
 @Parameters()

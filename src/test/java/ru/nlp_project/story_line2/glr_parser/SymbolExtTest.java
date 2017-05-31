@@ -1,11 +1,14 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol;
 import ru.nlp_project.story_line2.glr_parser.eval.Symbol.SymbolTypes;

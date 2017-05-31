@@ -1,9 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser.eval;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +9,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import ru.nlp_project.story_line2.glr_parser.TestFixtureBuilder;
 import ru.nlp_project.story_line2.glr_parser.Token;

@@ -6,8 +6,8 @@ import dagger.Component;
 import ru.nlp_project.story_line2.glr_parser.GLRParser;
 
 @Singleton
-@Component(modules = ApplicationModule.class)
-public abstract class ApplicationComponent {
+@Component(modules = GLRParserModule.class)
+public abstract class GLRParserComponent {
 
 	public abstract void inject(GLRParser parser);
 }

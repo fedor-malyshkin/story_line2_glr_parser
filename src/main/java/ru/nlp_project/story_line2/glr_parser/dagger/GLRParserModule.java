@@ -22,6 +22,7 @@ import ru.nlp_project.story_line2.glr_parser.IInterpreter;
 import ru.nlp_project.story_line2.glr_parser.INameFinder;
 import ru.nlp_project.story_line2.glr_parser.ISentenceProcessorPool;
 import ru.nlp_project.story_line2.glr_parser.ITokenManager;
+import ru.nlp_project.story_line2.glr_parser.ITokenTagger;
 import ru.nlp_project.story_line2.glr_parser.InterpreterImpl;
 import ru.nlp_project.story_line2.glr_parser.NameFinderImpl;
 import ru.nlp_project.story_line2.glr_parser.SentenceProcessorPoolImpl;
@@ -31,13 +32,13 @@ import ru.nlp_project.story_line2.glr_parser.keywords.KeywordManagerImpl;
 import ru.nlp_project.story_line2.token.SentenceDetector;
 
 @Module
-public class ApplicationModule {
+public class GLRParserModule {
 	boolean initMorph;
 	IFactListener factListener;
 	IGLRLogger logger;
 	String configurationPath;
 
-	public ApplicationModule(String configurationPath, IFactListener factListener,
+	public GLRParserModule(String configurationPath, IFactListener factListener,
 			IGLRLogger logger, boolean initMorph) {
 		super();
 		this.configurationPath = configurationPath;
@@ -128,6 +129,12 @@ public class ApplicationModule {
 	@Singleton
 	ITokenManager provideTokenManager(TokenManagerImpl instance) {
 		instance.initMorph = initMorph;
+		return instance;
+	}
+
+	@Provides
+	@Singleton
+	ITokenTagger provideTokenTagger(TokenTaggerImpl instance) {
 		return instance;
 	}
 
