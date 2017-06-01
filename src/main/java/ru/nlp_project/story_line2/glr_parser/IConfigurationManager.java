@@ -1,5 +1,6 @@
 package ru.nlp_project.story_line2.glr_parser;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +25,8 @@ public interface IConfigurationManager {
 		public String sentenceData;
 		@JsonProperty("glr_parser.morph_zip_db")
 		public String morphZipDB;
-		@JsonProperty("glr_parser.tagger_zip_db")
-		public String taggerZipDB;
+		@JsonProperty("glr_parser.tagger_json_db")
+		public String taggerJsonDB;
 		@JsonProperty("glr_parser.articles")
 		public List<String> articles;
 		@JsonProperty("glr_parser.fact_file")
@@ -37,7 +38,7 @@ public interface IConfigurationManager {
 		public String toString() {
 			return "MasterConfiguration [debug=" + debug + ", dictionaryFile=" + dictionaryFile
 					+ ", sentenceData=" + sentenceData + ", morphZipDB=" + morphZipDB
-					+ ", taggerZipDB=" + taggerZipDB + ", articles=" + articles + ", factFile="
+					+ ", taggerZipDB=" + taggerJsonDB + ", articles=" + articles + ", factFile="
 					+ factFile + ", hierarchyFile=" + hierarchyFile + "]";
 		}
 	}
