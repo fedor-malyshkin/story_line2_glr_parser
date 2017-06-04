@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -42,11 +44,6 @@ import ru.nlp_project.story_line2.morph.WordformAnalysisResult;
  */
 public class TokenManagerImpl implements ITokenManager {
 
-	@Inject
-	public TokenManagerImpl() {
-		super();
-	}
-
 	class FIOKeywordToken extends Token {
 
 		LinkedList<Token> originalTokens;
@@ -76,6 +73,7 @@ public class TokenManagerImpl implements ITokenManager {
 		}
 
 	}
+
 
 	/**
 	 * Класс токенов на базе обнаруженных вхождений грамматик (комбинированный токен).
@@ -141,13 +139,16 @@ public class TokenManagerImpl implements ITokenManager {
 	}
 
 	private static final char SIMPLE_TOKEN_SERIALIZATION_SEP = '_';
+
 	private static MorphAnalyser morphAnalyser;
+
 	public static String RUS_VOWELS = "уеыаоэюия";
 	public static String RUS_CONSONANTS = "йцкнгшщзхфвпрлджчсмтб";
 	private static char[] DELIMERS =
 			{' ', ',', '.', '\'', '"', '!', '?', '-', ':', '~', '`', '@', '#', '$', '%', '^', '&',
 					'*', '(', ')', '{', '}', '[', ']', '<', '>', ';', '|', '\\', '/', '«', '»'};
 	private static char[] QUOTES = {'"', '`', '\'', '«', '»'};
+	private Set<String> STOPWORDS;
 	private static char[] LBRACKETS = {'(', '{', '[', '<'};
 	private static char[] RBRACKETS = {')', '}', ']', '>'};
 	private static char[] NUMBERS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -156,7 +157,6 @@ public class TokenManagerImpl implements ITokenManager {
 	public static MorphAnalyser getMorphAnalyser() {
 		return morphAnalyser;
 	}
-
 
 	/**
 	 * 
@@ -191,18 +191,24 @@ public class TokenManagerImpl implements ITokenManager {
 		return result;
 	}
 
-
 	@Inject
 	public IKeywordManager keywordManager = null;
 
+
 	public boolean initMorph;
+
+
 	@Inject
 	public IConfigurationManager configurationManager;
+
+	@Inject
+	public TokenManagerImpl() {
+		super();
+	}
 
 	public TokenManagerImpl(boolean initMorph) {
 		this.initMorph = initMorph;
 	}
-
 
 	protected void analyseTokenKeywords(Token token) {
 		token.kwColon = token.value.equals(":");
@@ -218,6 +224,7 @@ public class TokenManagerImpl implements ITokenManager {
 		token.kwQuoteSng = StringUtils.containsOnly(token.value, '"', '`', '\'');
 		token.kwWord = !StringUtils.containsAny(token.value, WORD_DISALLOWED_SYMBOLS);
 	}
+
 
 	protected void analyseTokenRegistry(Token token) {
 		// uReg
@@ -560,6 +567,21 @@ public class TokenManagerImpl implements ITokenManager {
 			throw new IllegalStateException(e);
 		}
 
+
+		// source: http://www.ruscorpora.ru/corpora-freq.html
+		// inti stopwords
+		STOPWORDS = new HashSet<>(Arrays.asList("и", "в", "не", "на", "с", "что", "как", "я", "к",
+				"он", "по", "а", "его", "из", "это", "от", "все", "за", "у", "же", "то", "В", "но",
+				"о", "И", "А", "было", "для", "так", "бы", "только", "был", "ее", "она", "но",
+				"или", "меня", "их", "еще", "мне", "мы", "до", "уже", "он", "они", "когда", "ни",
+				"ему", "чтобы", "быть", "ты", "при", "есть", "были", "была", "даже", "вы", "если",
+				"сказал", "очень", "ли", "это", "может", "во", "себя", "не", "него", "под", "нас",
+				"со", "того", "на", "чем", "будет", "этого", "где", "без", "этом", "нет", "себе",
+				"раз", "вот", "том", "да", "можно", "них", "которые", "да", "всех", "с", "тем",
+				"там", "человек", "теперь", "этот", "который", "после", "что", "ну", "ничего",
+				"потому", "лет", "один", "вот", "надо", "она", "своей", "всего", "тоже", "так",
+				"через", "тут", "потом", "им", "этой", "У", "ним", "больше", "нам", "мы", "здесь",
+				"вас", "тогда", "эти", "все", "о"));
 	}
 
 	/**
@@ -630,6 +652,17 @@ public class TokenManagerImpl implements ITokenManager {
 	@Override
 	public List<SurnameAnalysisResult> predictAsSurnameAndFillLexemes(Token token) {
 		return morphAnalyser.predictAsSurname(token.value.toLowerCase());
+	}
+
+	@Override
+	public void removeStopwords(List<Token> tokens) {
+		Iterator<Token> iterator = tokens.iterator();
+		while (iterator.hasNext()) {
+			Token token = iterator.next();
+			if (STOPWORDS.contains(token.getValue().toLowerCase()))
+				iterator.remove();
+		}
+
 	}
 
 	public void shutdown() {

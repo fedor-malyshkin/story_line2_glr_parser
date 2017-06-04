@@ -1,5 +1,7 @@
 package ru.nlp_project.story_line2.glr_parser.keywords;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,7 +86,7 @@ public class KeywordsManagerImplTest {
 	}
 
 	/**
-	 * Обследовать следующую странную комьинаци, приводящую к зависанию кода 0-4; 24-4; 0-2; 1-3;
+	 * Обследовать следующую странную комбинацию, приводящую к зависанию кода 0-4; 24-4; 0-2; 1-3;
 	 * 1-1; 2-2; 3-1; 13-3; 14-2; 15-1; 24-3; 25-3; 24-2; 25-2; 26-2; 25-1; 25-1; 27-1; 27-1; 15-1;
 	 * 3-1
 	 * 
@@ -125,6 +127,32 @@ public class KeywordsManagerImplTest {
 		List<? extends IKeywordEntrance> coverage =
 				testable.calculateOptimalKeywordsCoverage(kwes, 29);
 		assertEquals("[<0;4;0;0(0)>, <13;3;0;1(0)>, <24;4;0;1(0)>]", coverage.toString());
+	}
+
+	/**
+	 * Проверить расчёт комбинаций при которых необходимо предотвратить комбинаторный взрыв, но при
+	 * этом вычислить макимальное покрытие.
+	 */
+	@Test(timeout = 1000)
+	public void test_BUG_CalculateOptimalKeywordsCoverage_CombinationBOOM() {
+		List<PlainKeywordEntrance> kwes = new ArrayList<PlainKeywordEntrance>();
+		// большое количество НЕПЕРЕКРЫВАЮЩИХСЯ вхождений -- должны быть сохранены
+		for (int i = 0; i < 100; i++) {
+			// 0-4; 24-4; 0-2;
+			kwes.add(new PlainKeywordEntrance(i, 1, 0, 0, 0, null));
+		}
+		// большая комбинация -- не должна быть откинута и должна заменить собою 3 короткие
+		kwes.add(new PlainKeywordEntrance(50, 5, 0, 0, 0, null));
+
+
+		List<? extends IKeywordEntrance> coverage =
+				testable.calculateOptimalKeywordsCoverage(kwes, 29);
+		assertThat(coverage.toString()).startsWith(
+				"[<0;1;0;0(0)>, <1;1;0;0(0)>, <2;1;0;0(0)>, <3;1;0;0(0)>, <4;1;0;0(0)>, <5;1;0;0(0)>, ");
+		assertThat(coverage.toString()).endsWith(
+				"<94;1;0;0(0)>, <95;1;0;0(0)>, <96;1;0;0(0)>, <97;1;0;0(0)>, <98;1;0;0(0)>, <99;1;0;0(0)>]");
+		assertThat(coverage.toString()).contains(
+				"<48;1;0;0(0)>, <49;1;0;0(0)>, <50;5;0;0(0)>, <55;1;0;0(0)>, <56;1;0;0(0)>,");
 	}
 
 	@Test

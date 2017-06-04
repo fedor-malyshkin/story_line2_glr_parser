@@ -49,4 +49,14 @@ public interface ITokenManager {
 
 	void shutdown();
 
+	/**
+	 * Удалить стоп слова.
+	 * 
+	 * При это не меняются атрибуты (старт, длина) имеющихся токенов, т.к. удаление стоп слов
+	 * осуществляется из результатов анализа, а не из исходного текста.
+	 * 
+	 * @param tokens
+	 */
+	void removeStopwords(List<Token> tokens);
+
 }

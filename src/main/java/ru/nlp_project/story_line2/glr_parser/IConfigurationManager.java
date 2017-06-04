@@ -1,6 +1,5 @@
 package ru.nlp_project.story_line2.glr_parser;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,14 +32,18 @@ public interface IConfigurationManager {
 		public String factFile;
 		@JsonProperty("glr_parser.hierarchy_file")
 		public String hierarchyFile;
+		@JsonProperty("glr_parser.remove_stopwords")
+		public boolean removeStopwords = false;
 
 		@Override
 		public String toString() {
 			return "MasterConfiguration [debug=" + debug + ", dictionaryFile=" + dictionaryFile
 					+ ", sentenceData=" + sentenceData + ", morphZipDB=" + morphZipDB
-					+ ", taggerZipDB=" + taggerJsonDB + ", articles=" + articles + ", factFile="
-					+ factFile + ", hierarchyFile=" + hierarchyFile + "]";
+					+ ", taggerJsonDB=" + taggerJsonDB + ", articles=" + articles + ", factFile="
+					+ factFile + ", hierarchyFile=" + hierarchyFile + ", removeStopwords="
+					+ removeStopwords + "]";
 		}
+
 	}
 
 	// To ignore any unknown properties in JSON input without exception:

@@ -257,18 +257,11 @@ public class KeywordManagerImpl implements IKeywordManager {
 		ArrayList<CoverageVariant> coverageVariants =
 				new ArrayList<KeywordManagerImpl.CoverageVariant>();
 		// dumb one
-		coverageVariants.add(
-				new CoverageVariant(0, tokensLength, Collections.<IKeywordEntrance>emptyList()));
+		coverageVariants
+				.add(new CoverageVariant(0, tokensLength, new ArrayList<IKeywordEntrance>()));
 		for (int i = 0; i < list.size(); i++) {
 			IKeywordEntrance kwe = list.get(i);
-			// int currFrom = kwe.getFrom();
-			// do {
-			// kwe = kwes.get(i);
 			createCoverageVariants(coverageVariants, kwe);
-			// i++;
-			// }
-			// выполняем действия для всех элементов с одинаковыми from
-			// while (i < kwes.size() - 1 && currFrom == kwes.get(i).getFrom());
 		}
 		// System.out.println(coverageVariants.size());
 		List<? extends IKeywordEntrance> result = null;
@@ -340,8 +333,8 @@ public class KeywordManagerImpl implements IKeywordManager {
 	 * 
 	 * Алгоритм примерно такой: Проходим по всем уже имеющимся и:
 	 * <ul>
-	 * <li>Создаем новый (на базе данных имеющегося), если окончание текущего вхождения меньше/равно
-	 * начала самого раннего токена в покрытии.</li>
+	 * <li>Изменяем текущий вариант, если окончание текущего вхождения меньше/равно начала самого
+	 * раннего токена в покрытии.</li>
 	 * <li>Создаем новый (на базе данных имеющегося), если окончание текущего вхождения больше
 	 * начала самого раннего токена в покрытии (при этом из нового варианта удаляются вхождения,
 	 * создающие подобное условие).</li>
@@ -355,30 +348,30 @@ public class KeywordManagerImpl implements IKeywordManager {
 			IKeywordEntrance kwe) {
 		int origSize = coverageVariants.size();
 		for (int i = 0; i < origSize; i++) {
-			CoverageVariant dOpt = coverageVariants.get(i);
+			CoverageVariant currVariant = coverageVariants.get(i);
 			int kweEnd = kwe.getFrom() + kwe.getLength();
-			if (kweEnd <= dOpt.from) {
+			if (kweEnd <= currVariant.from) {
 				/*
-				 * Создаем новый (на базе имеющегося), если окончание текущего вхождения
-				 * меньше/равно начала самого раннего токена в покрытии.
+				 * Изменяем текущий вариант, если окончание текущего вхождения меньше/равно начала
+				 * самого раннего токена в покрытии.
 				 */
-				ArrayList<IKeywordEntrance> list = new ArrayList<IKeywordEntrance>(dOpt.contains);
-				// добавляем наше вхождение
+				List<IKeywordEntrance> list = (List<IKeywordEntrance>) currVariant.contains;
 				list.add(kwe);
-				coverageVariants.add(new CoverageVariant(dOpt.coverageLength + kwe.getLength(),
-						kwe.getFrom(), list));
+				currVariant.from = kwe.getFrom();
+				currVariant.coverageLength = currVariant.coverageLength + kwe.getLength();
 			} else {
 				/*
 				 * Создаем новый (на базе имеющегося), если окончание текущего вхождения больше
 				 * начала самого раннего токена в покрытии (при этом из нового варианта удаляются
 				 * вхождения, создающие подобное условие).
 				 */
-				LinkedList<IKeywordEntrance> list = new LinkedList<IKeywordEntrance>(dOpt.contains);
+				LinkedList<IKeywordEntrance> list =
+						new LinkedList<IKeywordEntrance>(currVariant.contains);
 				while (list.size() > 0 && (kweEnd > list.getLast().getFrom()))
 					list.removeLast();
 				// добавляем наше вхождение
 				list.add(kwe);
-				coverageVariants.add(dOpt.newInstanceFromList(list));
+				coverageVariants.add(currVariant.newInstanceFromList(list));
 			}
 		}
 	}

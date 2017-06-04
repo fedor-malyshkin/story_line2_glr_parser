@@ -1,5 +1,7 @@
 package ru.nlp_project.story_line2.glr_parser;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,6 +25,12 @@ import ru.nlp_project.story_line2.glr_parser.InterpreterImpl.FactField;
 import ru.nlp_project.story_line2.glr_parser.ParseTreeValidator.ParseTreeValidationException;
 
 public class GLRParserTestIntegr {
+
+	@Before
+	public void setUp() {
+		factSerializer.clear();
+		grammarSerializationLogger.clear();
+	}
 
 	static class FactSerializer implements IFactListener {
 		List<String> factsSerialized = Collections.synchronizedList(new LinkedList<String>());
@@ -77,7 +86,6 @@ public class GLRParserTestIntegr {
 				ParseTreeNode userTree, boolean validated, ParseTreeValidationException exception) {
 			detectedParseTreeSerialized
 					.add(serializeParseTree(context, tree, userTree, validated, exception));
-
 		}
 
 		private String serializeParseTree(SentenceProcessingContext context, ParseTreeNode tree,
@@ -97,10 +105,9 @@ public class GLRParserTestIntegr {
 
 	private static GLRParser testable;
 	private static FactSerializer factSerializer;
-
 	private static GrammarSerializationLogger grammarSerializationLogger;
-
 	private static String parserConfigDir;
+	private static ConfigurationManagerImpl configurationManager;
 
 	@BeforeClass
 	public static void setUpClass() throws IOException {
@@ -111,12 +118,40 @@ public class GLRParserTestIntegr {
 				.unzipToTempDir("ru/nlp_project/story_line2/glr_parser/GLRParserTestIntegr.zip");
 		testable = GLRParser.newInstance("file://" + parserConfigDir + "/glr-config.yaml",
 				grammarSerializationLogger, factSerializer, true, false);
+		configurationManager = (ConfigurationManagerImpl) testable.configurationManager;
+	}
+
+	@Test
+	public void testExtractDates() throws IOException {
+		testable.processText(Arrays.asList("absolute_dates"),
+				"В четверг 9 июля схожую позицию озвучил помощник Медведева Аркадий Дворкович.");
+
+		String result =
+				factSerializer.factsSerialized.stream().sorted().collect(Collectors.joining("\n"));
+		assertEquals(
+				"[artc: absolute_dates][snt-st: 0][fact: TEMPORAL<day_of_week='null'(0,0); absolute_date='четверг 9 июля'(1,3)>]",
+				result);
+	}
+
+	/**
+	 * Проверка отсуствия бага с генерацией новых не нужных токенов при извлечении GrammarKW с FIO.
+	 * Вторая статья "geos" необходима лищь для выявления бага (будет NPE при работе с лексемами
+	 * нового странного токена).
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void testExtractingFios() throws IOException {
+
+		testable.processText(Arrays.asList("fios", "geos"), "Фото Дмитрия Торопова");
+
+		String result =
+				factSerializer.factsSerialized.stream().sorted().collect(Collectors.joining("\n"));
+		assertEquals("[artc: fios][snt-st: 0][fact: FIO<FIO='торопова дмитрий'(1,1)>]", result);
 	}
 
 	@Test
 	public void testTest0() throws IOException {
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
 		String text = "Он одел пальто, сапоги, шапку и пошёл...";
 		testable.processText(Arrays.asList("testTest02"), text);
 
@@ -129,9 +164,6 @@ public class GLRParserTestIntegr {
 
 	@Test
 	public void testTest00_0() throws IOException {
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
-
 		String text = "Синяя Юлия синей Юлии синей Юлия.";
 		testable.processText(Arrays.asList("testTest00"), text);
 		assertEquals(
@@ -143,9 +175,6 @@ public class GLRParserTestIntegr {
 
 	@Test
 	public void testTest00_1() throws IOException {
-
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
 		String text =
 				"В последние несколько месяцев Саудовская Аравия и Россия провели целую серию консультаций, "
 						+ "но не достигли пока каких-то прорывных решений, о чем сообщают американские и саудовские официальные "
@@ -174,8 +203,6 @@ public class GLRParserTestIntegr {
 
 	@Test
 	public void testTest01() throws IOException {
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
 		String text =
 				"В последние несколько месяцев Саудовская Аравия и Россия провели целую серию консультаций, "
 						+ "но не достигли пока каких-то прорывных решений, о чем сообщают американские и саудовские официальные "
@@ -263,8 +290,6 @@ public class GLRParserTestIntegr {
 
 	@Test
 	public void testTest03() throws IOException {
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
 		String text =
 				"Не помню как назвали научный центр: то ли 'имЯни Москвина', то ли 'имени Пирогова'. "
 						+ "Кроме этого я посетил ещё пару научных центров и исследовательских комплексов.";
@@ -281,8 +306,6 @@ public class GLRParserTestIntegr {
 
 	@Test
 	public void testTest04() throws IOException {
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
 		String text =
 				"Дом плавал. Синий слон плавал. Рыжий Тигр летал. Рыжий тигр. Сильный МосОблБанк летал.";
 		testable.processText(Arrays.asList("testTest04"), text);
@@ -299,8 +322,6 @@ public class GLRParserTestIntegr {
 
 	@Test
 	public void testTest05() throws IOException {
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
 		String text =
 				"Лектор Иван Петрович Смольников будет нам читать рассказ \"Мой друг Иван Лапшин\".";
 		testable.processText(Arrays.asList("testTest05"), text);
@@ -311,40 +332,40 @@ public class GLRParserTestIntegr {
 				"[artc: testTest05][snt-st: 0][fact: FIO<FIO='иван петрович'(1,1)>]\n"
 						+ "[artc: testTest05][snt-st: 0][fact: FIO<FIO='лапшин иван'(10,1)>]",
 				result);
-
 	}
 
 	@Test
-	public void testExtractDates() throws IOException {
-		factSerializer.clear();
-		grammarSerializationLogger.clear();
-		testable.processText(Arrays.asList("absolute_dates"),
-				"В четверг 9 июля схожую позицию озвучил помощник Медведева Аркадий Дворкович.");
+	public void testTestRemoveStopWords() throws IOException {
+		String text =
+				"В последние несколько месяцев Саудовская Аравия и Россия провели целую серию консультаций, "
+						+ "но не достигли пока каких-то прорывных решений, о чем сообщают американские и саудовские официальные "
+						+ "представители";
+		testable.processText(Arrays.asList("words"), text);
 
 		String result =
 				factSerializer.factsSerialized.stream().sorted().collect(Collectors.joining("\n"));
-		assertEquals(
-				"[artc: absolute_dates][snt-st: 0][fact: TEMPORAL<day_of_week='null'(0,0); absolute_date='четверг 9 июля'(1,3)>]",
-				result);
-	}
+		assertThat(factSerializer.factsSerialized.size()).isEqualTo(29);
+		assertThat(result).contains("[artc: words][snt-st: 0][fact: Words<Word='-'(18,1)>]");
+		assertThat(result).contains("[artc: words][snt-st: 0][fact: Words<Word='в'(0,1)>]");
+		assertThat(result).contains("[artc: words][snt-st: 0][fact: Words<Word='но'(13,1)>]");
 
-	/**
-	 * Проверка отсуствия бага с генерацией новых не нужных токенов при извлечении GrammarKW с FIO.
-	 * Вторая статья "geos" необходима лищь для выявления бага (будет NPE при работе с лексемами
-	 * нового странного токена).
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void testExtractingFios() throws IOException {
+		// save oldBValue
+		boolean prevValue = configurationManager.getMasterConfiguration().removeStopwords;
+		configurationManager.getMasterConfiguration().removeStopwords = true;
 		factSerializer.clear();
 		grammarSerializationLogger.clear();
+		testable.processText(Arrays.asList("words"), text);
+		// restore
+		configurationManager.getMasterConfiguration().removeStopwords = prevValue;
 
-		testable.processText(Arrays.asList("fios", "geos"), "Фото Дмитрия Торопова");
+		result = factSerializer.factsSerialized.stream().sorted().collect(Collectors.joining("\n"));
+		assertThat(factSerializer.factsSerialized.size()).isLessThan(29);
+		assertThat(result).doesNotContain("[artc: words][snt-st: 0][fact: Words<Word='-'(18,1)>]");
+		assertThat(result).doesNotContain("[artc: words][snt-st: 0][fact: Words<Word='в'(0,1)>]");
+		assertThat(result).doesNotContain("[artc: words][snt-st: 0][fact: Words<Word='но'(13,1)>]");
 
-		String result =
-				factSerializer.factsSerialized.stream().sorted().collect(Collectors.joining("\n"));
-		assertEquals("[artc: fios][snt-st: 0][fact: FIO<FIO='торопова дмитрий'(1,1)>]", result);
 	}
+
+
 
 }

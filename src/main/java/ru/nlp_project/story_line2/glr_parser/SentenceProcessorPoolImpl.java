@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import ru.nlp_project.story_line2.glr_parser.GLRParser.Sentence;
+import ru.nlp_project.story_line2.glr_parser.IConfigurationManager.MasterConfiguration;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordEntrance;
 import ru.nlp_project.story_line2.glr_parser.keywords.IKeywordManager;
 
@@ -18,6 +19,8 @@ public class SentenceProcessorPoolImpl implements ISentenceProcessorPool {
 
 	@Inject
 	public IDictionaryManager dictionaryManager;
+	@Inject
+	public IConfigurationManager configurationManager;
 	@Inject
 	public IFactListener factListener;
 	@Inject
@@ -76,6 +79,11 @@ public class SentenceProcessorPoolImpl implements ISentenceProcessorPool {
 		// поиск имен - один раз для всех статей
 		processNames(tokens);
 
+		MasterConfiguration configuration = configurationManager.getMasterConfiguration();
+		if (configuration.removeStopwords) {
+			tokenManager.removeStopwords(tokens);
+		}
+
 		// for each article
 		for (String article : articles) {
 			SentenceProcessingContext context =
@@ -83,6 +91,8 @@ public class SentenceProcessorPoolImpl implements ISentenceProcessorPool {
 			dictionaryManager.processArticle(context, tokens);
 		}
 		logger.endSentenceProcessing(sentence, articles);
+
+
 	}
 
 	private void processNames(List<Token> tokens) {
